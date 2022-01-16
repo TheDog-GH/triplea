@@ -100,15 +100,15 @@ public abstract class I18nResourceBundle {
    * @param arguments formatting arguments
    * @return Language dependent text
    */
-  public String getText(final String key, final Object... arguments) {
-    return MessageFormat.format(getText(key), arguments);
+  public String getString(final String key, final Object... arguments) {
+    return MessageFormat.format(getString(key), arguments);
   }
 
   /**
    * @param key Bundle property key
    * @return Language dependent text
    */
-  public String getText(final String key) {
+  public String getString(final String key) {
     return bundle.getString(key);
   }
 }
