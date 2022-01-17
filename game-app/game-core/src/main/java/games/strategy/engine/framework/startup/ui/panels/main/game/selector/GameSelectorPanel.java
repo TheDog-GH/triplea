@@ -7,6 +7,9 @@ import games.strategy.engine.data.GameData;
 import games.strategy.engine.data.properties.IEditableProperty;
 import games.strategy.engine.data.properties.PropertiesUi;
 import games.strategy.engine.framework.HeadlessAutoSaveType;
+import games.strategy.engine.framework.HtmlUtils;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.map.download.DownloadMapsWindow;
 import games.strategy.engine.framework.map.file.system.loader.InstalledMapsListing;
 import games.strategy.engine.framework.startup.mc.ClientModel;
@@ -23,10 +26,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Consumer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -55,25 +60,9 @@ public final class GameSelectorPanel extends JPanel implements Observer {
   private final JLabel nameText = new JLabel();
   private final JLabel saveGameText = new JLabel();
   private final JLabel roundText = new JLabel();
-  private final JButton loadSavedGame =
-      new JButtonBuilder()
-          .title("Open Saved Game")
-          .toolTip("Open a previously saved game, or an autosave.")
-          .build();
-  private final JButton loadNewGame =
-      new JButtonBuilder()
-          .title("Select Game")
-          .toolTip(
-              "<html>Select a game from all the maps/games that come with TripleA, "
-                  + "<br>and the ones you have downloaded.</html>")
-          .build();
-  private final JButton mapOptions =
-      new JButtonBuilder()
-          .title("Game Options")
-          .toolTip(
-              "<html>Set options for the currently selected game, <br>such as enabling/disabling "
-                  + "Low Luck, or Technology, etc.</html>")
-          .build();
+  private final JButton loadSavedGame = new JButton();
+  private final JButton loadNewGame = new JButton();
+  private final JButton mapOptions = new JButton();
 
   public GameSelectorPanel(final GameSelectorModel model) {
     this.model = model;
@@ -83,95 +72,28 @@ public final class GameSelectorPanel extends JPanel implements Observer {
       gamePropertiesCache.loadCachedGamePropertiesInto(data);
     }
 
+    initButtons(model);
+
     setLayout(new GridBagLayout());
 
-    final JLabel logoLabel =
-        new JLabel(
-            new ImageIcon(
-                ResourceLoader.loadImageAsset(Path.of("launch_screens", "triplea-logo.png"))));
+    fillComponent(model);
 
-    int row = 0;
-    add(
-        logoLabel,
-        new GridBagConstraintsBuilder(0, row)
-            .gridWidth(2)
-            .insets(new Insets(10, 10, 3, 5))
-            .build());
-    row++;
+    updateGameData();
+  }
 
-    add(new JLabel("Java Version:"), buildGridCell(0, row, new Insets(10, 10, 3, 5)));
-    add(
-        new JLabel(SystemProperties.getJavaVersion()),
-        buildGridCell(1, row, new Insets(10, 0, 3, 0)));
-    row++;
+  private void initButtons(final GameSelectorModel model) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
 
-    add(new JLabel("Engine Version:"), buildGridCell(0, row, new Insets(0, 10, 3, 5)));
-    add(
-        new JLabel(Injections.getInstance().getEngineVersion().toString()),
-        buildGridCell(1, row, new Insets(0, 0, 3, 0)));
-    row++;
+    loadSavedGame.setText(bundle.getString("startup.GameSelectorPanel.btn.OpenSavedGame.Lbl"));
+    loadSavedGame.setToolTipText(
+        bundle.getString("startup.GameSelectorPanel.btn.OpenSavedGame.Tltp"));
+    loadNewGame.setText(bundle.getString("startup.GameSelectorPanel.btn.SelectGame.Lbl"));
+    loadNewGame.setToolTipText(
+        HtmlUtils.getHtml(bundle.getString("startup.GameSelectorPanel.btn.SelectGame.Tltp")));
+    mapOptions.setText(bundle.getString("startup.GameSelectorPanel.btn.GameOptions.Lbl"));
+    mapOptions.setToolTipText(
+        HtmlUtils.getHtml(bundle.getString("startup.GameSelectorPanel.btn.GameOptions.Tltp")));
 
-    add(new JLabel("Game Name:"), buildGridCell(0, row, new Insets(0, 10, 3, 5)));
-    add(nameText, buildGridCell(1, row, new Insets(0, 0, 3, 0)));
-    row++;
-
-    add(new JLabel("Game Round:"), buildGridCell(0, row, new Insets(0, 10, 3, 5)));
-    add(roundText, buildGridCell(1, row, new Insets(0, 0, 3, 0)));
-    row++;
-
-    add(new JLabel("Loaded Savegame:"), buildGridCell(0, row, new Insets(20, 10, 3, 5)));
-    row++;
-
-    add(saveGameText, buildGridRow(0, row, new Insets(0, 10, 3, 5)));
-    row++;
-
-    add(loadNewGame, buildGridRow(0, row, new Insets(25, 10, 10, 10)));
-    row++;
-
-    add(loadSavedGame, buildGridRow(0, row, new Insets(0, 10, 10, 10)));
-    row++;
-
-    final JButton downloadMapButton =
-        new JButtonBuilder()
-            .title("Download Maps")
-            .toolTip("Click this button to install additional maps")
-            .actionListener(DownloadMapsWindow::showDownloadMapsWindow)
-            .build();
-    add(downloadMapButton, buildGridRow(0, row, new Insets(0, 10, 10, 10)));
-    row++;
-
-    add(mapOptions, buildGridRow(0, row, new Insets(25, 10, 10, 10)));
-    row++;
-
-    // spacer
-    add(
-        new JPanel(),
-        new GridBagConstraints(
-            0,
-            row,
-            2,
-            1,
-            1,
-            1,
-            GridBagConstraints.CENTER,
-            GridBagConstraints.BOTH,
-            new Insets(0, 0, 0, 0),
-            0,
-            0));
-
-    loadNewGame.addActionListener(
-        e -> {
-          if (canSelectLocalGameData()) {
-            selectGameFile();
-          } else if (canChangeHostBotGameData()) {
-            final ClientModel clientModelForHostBots = model.getClientModelForHostBots();
-            if (clientModelForHostBots != null) {
-              clientModelForHostBots
-                  .getHostBotSetMapClientAction(GameSelectorPanel.this)
-                  .actionPerformed(e);
-            }
-          }
-        });
     loadSavedGame.addActionListener(
         e -> {
           if (canSelectLocalGameData()) {
@@ -227,8 +149,107 @@ public final class GameSelectorPanel extends JPanel implements Observer {
             }
           }
         });
+  }
 
-    updateGameData();
+  private void fillComponent(final GameSelectorModel model) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+    final JLabel logoLabel =
+        new JLabel(
+            new ImageIcon(
+                ResourceLoader.loadImageAsset(Path.of("launch_screens", "triplea-logo.png"))));
+
+    int row = 0;
+    add(
+        logoLabel,
+        new GridBagConstraintsBuilder(0, row)
+            .gridWidth(2)
+            .insets(new Insets(10, 10, 3, 5))
+            .build());
+    row++;
+
+    add(
+        new JLabel(bundle.getString("startup.GameSelectorPanel.lbl.JavaVersion")),
+        buildGridCell(0, row, new Insets(10, 10, 3, 5)));
+    add(
+        new JLabel(SystemProperties.getJavaVersion()),
+        buildGridCell(1, row, new Insets(10, 0, 3, 0)));
+    row++;
+
+    add(
+        new JLabel(bundle.getString("startup.GameSelectorPanel.lbl.EngineVersion")),
+        buildGridCell(0, row, new Insets(0, 10, 3, 5)));
+    add(
+        new JLabel(Injections.getInstance().getEngineVersion().toString()),
+        buildGridCell(1, row, new Insets(0, 0, 3, 0)));
+    row++;
+
+    add(
+        new JLabel(bundle.getString("startup.GameSelectorPanel.lbl.GameName")),
+        buildGridCell(0, row, new Insets(0, 10, 3, 5)));
+    add(nameText, buildGridCell(1, row, new Insets(0, 0, 3, 0)));
+    row++;
+
+    add(
+        new JLabel(bundle.getString("startup.GameSelectorPanel.lbl.GameRound")),
+        buildGridCell(0, row, new Insets(0, 10, 3, 5)));
+    add(roundText, buildGridCell(1, row, new Insets(0, 0, 3, 0)));
+    row++;
+
+    add(
+        new JLabel(bundle.getString("startup.GameSelectorPanel.lbl.LoadedSaveGame")),
+        buildGridCell(0, row, new Insets(20, 10, 3, 5)));
+    row++;
+
+    add(saveGameText, buildGridRow(0, row, new Insets(0, 10, 3, 5)));
+    row++;
+
+    add(loadNewGame, buildGridRow(0, row, new Insets(25, 10, 10, 10)));
+    row++;
+
+    add(loadSavedGame, buildGridRow(0, row, new Insets(0, 10, 10, 10)));
+    row++;
+
+    final JButton downloadMapButton =
+        new JButtonBuilder()
+            .title(bundle.getString("startup.GameSelectorPanel.btn.DownloadMaps.Lbl"))
+            .toolTip(bundle.getString("startup.GameSelectorPanel.btn.DownloadMaps.Tltp"))
+            .actionListener(DownloadMapsWindow::showDownloadMapsWindow)
+            .build();
+    add(downloadMapButton, buildGridRow(0, row, new Insets(0, 10, 10, 10)));
+    row++;
+
+    add(mapOptions, buildGridRow(0, row, new Insets(25, 10, 10, 10)));
+    row++;
+
+    // spacer
+    add(
+        new JPanel(),
+        new GridBagConstraints(
+            0,
+            row,
+            2,
+            1,
+            1,
+            1,
+            GridBagConstraints.CENTER,
+            GridBagConstraints.BOTH,
+            new Insets(0, 0, 0, 0),
+            0,
+            0));
+
+    loadNewGame.addActionListener(
+        e -> {
+          if (canSelectLocalGameData()) {
+            selectGameFile();
+          } else if (canChangeHostBotGameData()) {
+            final ClientModel clientModelForHostBots = model.getClientModelForHostBots();
+            if (clientModelForHostBots != null) {
+              clientModelForHostBots
+                  .getHostBotSetMapClientAction(GameSelectorPanel.this)
+                  .actionPerformed(e);
+            }
+          }
+        });
   }
 
   private static GridBagConstraints buildGridCell(final int x, final int y, final Insets insets) {
@@ -269,18 +290,21 @@ public final class GameSelectorPanel extends JPanel implements Observer {
         model.getGameData().getProperties().getEditableProperties()) {
       currentPropertiesMap.put(property.getName(), property.getValue());
     }
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final PropertiesUi panel = new PropertiesUi(model.getGameData().getProperties(), true);
     final JScrollPane scroll = new JScrollPane(panel);
     scroll.setBorder(null);
     scroll.getViewport().setBorder(null);
     final JOptionPane pane = new JOptionPane(scroll, JOptionPane.PLAIN_MESSAGE);
-    final String ok = "OK";
-    final String cancel = "Cancel";
-    final String makeDefault = "Make Default";
-    final String reset = "Reset";
+    final String ok = bundle.getString("Option.OK");
+    final String cancel = bundle.getString("Option.Cancel");
+    final String makeDefault = bundle.getString("Option.MakeDefault");
+    final String reset = bundle.getString("Option.Reset");
     pane.setOptions(new Object[] {ok, makeDefault, reset, cancel});
     final JDialog window =
-        pane.createDialog(JOptionPane.getFrameForComponent(this), "Game Options");
+        pane.createDialog(
+            JOptionPane.getFrameForComponent(this),
+            bundle.getString("startup.GameSelectorPanel.dlg.GameOptions"));
     window.setVisible(true);
     final Object buttonPressed = pane.getValue();
     if (buttonPressed == null || buttonPressed.equals(cancel)) {
@@ -337,35 +361,41 @@ public final class GameSelectorPanel extends JPanel implements Observer {
   }
 
   private void selectSavedGameFile() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+
+    final Consumer<Exception> loadSaveGameException =
+        e ->
+            SwingComponents.showDialogWithLinks(
+                DialogWithLinksParams.builder()
+                    .title(
+                        bundle.getString("startup.GameSelectorPanel.dlg.LoadSaveGameException.Ttl"))
+                    .dialogType(DialogWithLinksTypes.ERROR)
+                    .dialogText(
+                        bundle.getString(
+                            "startup.GameSelectorPanel.dlg.LoadSaveGameException.Txt",
+                            e.getMessage(),
+                            UrlConstants.GITHUB_ISSUES))
+                    .build());
+
     GameFileSelector.builder()
         .fileDoesNotExistAction(
             file ->
                 DialogBuilder.builder()
                     .parent(this)
-                    .title("Save Game File Not Found")
-                    .errorMessage("File does not exist: " + file.toAbsolutePath())
+                    .title(bundle.getString("startup.GameSelectorPanel.dlg.FileNotFound.Ttl"))
+                    .errorMessage(
+                        MessageFormat.format(
+                            bundle.getString("startup.GameSelectorPanel.dlg.FileNotFound.errMsg"),
+                            file.toAbsolutePath()))
                     .showDialog())
         .build()
         .selectGameFile(JOptionPane.getFrameForComponent(this))
         .ifPresent(
             file ->
                 TaskRunner.builder()
-                    .waitDialogTitle("Loading Save Game")
-                    .exceptionHandler(
-                        e ->
-                            SwingComponents.showDialogWithLinks(
-                                DialogWithLinksParams.builder()
-                                    .title("Failed To Load Save Game")
-                                    .dialogType(DialogWithLinksTypes.ERROR)
-                                    .dialogText(
-                                        String.format(
-                                            "<html>Error: %s<br/><br/>"
-                                                + "If this is not expected, please "
-                                                + "file a <a href=%s>bug report</a><br/>"
-                                                + "and attach the error message above and the "
-                                                + "save game you are trying to load.",
-                                            e.getMessage(), UrlConstants.GITHUB_ISSUES))
-                                    .build()))
+                    .waitDialogTitle(
+                        bundle.getString("startup.GameSelectorPanel.dlg.LoadSaveGame.Ttl"))
+                    .exceptionHandler(loadSaveGameException)
                     .build()
                     .run(
                         () -> {
@@ -376,10 +406,12 @@ public final class GameSelectorPanel extends JPanel implements Observer {
   }
 
   private void selectGameFile() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     try {
       final InstalledMapsListing installedMapsListing =
           BackgroundTaskRunner.runInBackgroundAndReturn(
-              "Loading all available games...", InstalledMapsListing::parseMapFiles);
+              bundle.getString("startup.GameSelectorPanel.tsk.InstallMaps.Msg"),
+              InstalledMapsListing::parseMapFiles);
 
       GameChooser.chooseGame(
           JOptionPane.getFrameForComponent(this),
@@ -392,8 +424,9 @@ public final class GameSelectorPanel extends JPanel implements Observer {
   }
 
   private void gameSelected(final Path gameFile) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     BackgroundTaskRunner.runInBackground(
-        "Loading map...",
+        bundle.getString("startup.GameSelectorPanel.tsk.LoadFile.Msg"),
         () -> {
           model.load(gameFile);
           // warning: NPE check is not to protect against concurrency, another thread could still
