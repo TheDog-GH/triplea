@@ -3,6 +3,7 @@ package games.strategy.engine.framework.startup.ui;
 import games.strategy.engine.ClientFileSystemHelper;
 import games.strategy.engine.data.GameData;
 import games.strategy.engine.data.properties.IEditableProperty;
+import games.strategy.engine.framework.I18nEngineFramework;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -50,7 +51,12 @@ public class FileBackedGamePropertiesCache implements IGamePropertiesCache {
         out.writeObject(serializableMap);
       }
     } catch (final IOException e) {
-      log.error("Failed to write game properties to cache: " + cache.toAbsolutePath(), e);
+      log.error(
+          I18nEngineFramework.get()
+              .getString(
+                  "startup.FileBackedGamePropertiesCache.err.WriteGameProperties",
+                  cache.toAbsolutePath()),
+          e);
     }
   }
 
@@ -75,7 +81,12 @@ public class FileBackedGamePropertiesCache implements IGamePropertiesCache {
         }
       }
     } catch (final IOException | ClassNotFoundException e) {
-      log.error("Failed to load game properties from cache: " + cache.toAbsolutePath(), e);
+      log.error(
+          I18nEngineFramework.get()
+              .getString(
+                  "startup.FileBackedGamePropertiesCache.err.LoadGameProperties",
+                  cache.toAbsolutePath()),
+          e);
     }
   }
 

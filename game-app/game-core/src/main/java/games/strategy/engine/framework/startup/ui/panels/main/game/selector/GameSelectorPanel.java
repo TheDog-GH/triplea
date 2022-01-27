@@ -26,7 +26,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
@@ -384,8 +383,8 @@ public final class GameSelectorPanel extends JPanel implements Observer {
                     .parent(this)
                     .title(bundle.getString("startup.GameSelectorPanel.dlg.FileNotFound.Ttl"))
                     .errorMessage(
-                        MessageFormat.format(
-                            bundle.getString("startup.GameSelectorPanel.dlg.FileNotFound.errMsg"),
+                        bundle.getString(
+                            "startup.GameSelectorPanel.dlg.FileNotFound.errMsg",
                             file.toAbsolutePath()))
                     .showDialog())
         .build()
