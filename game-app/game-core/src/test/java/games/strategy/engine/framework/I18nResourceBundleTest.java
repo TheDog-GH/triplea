@@ -4,17 +4,73 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NonNls;
 import org.junit.jupiter.api.Test;
 
 class I18nResourceBundleTest {
   private static final String resourcePath = "propertyTest";
   private static final int maxTextMatchLengthWithEn = 10;
+
+  private static int countStringsIn(final File file) {
+    int sum = 0;
+    if (file.isDirectory()) {
+      final File[] subfiles = file.listFiles();
+      final Iterator<File> fileIterator = Arrays.stream(subfiles).iterator();
+      while (fileIterator.hasNext()) {
+        sum += countStringsIn(fileIterator.next());
+      }
+    } else if (file.getName().endsWith(".java")) {
+      final BufferedReader reader;
+      try {
+        reader = new BufferedReader(new FileReader(file));
+      } catch (final FileNotFoundException e) {
+        return sum;
+      }
+      final Pattern pattern = Pattern.compile(".*\".*\".*");
+      while (1 > 0) {
+        String line = null;
+        try {
+          line = reader.readLine();
+        } catch (final IOException e) {
+          break;
+        }
+        if (line == null) break;
+        final Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) sum++;
+      }
+      try {
+        reader.close();
+      } catch (final IOException e) {
+        return sum;
+      }
+    }
+    return sum;
+  }
+
+  @Test
+  void stringCount() {
+    String currentWorkingDir = System.getProperty("user.dir");
+    // final Path root = Paths.getClientFileSystemHelper.getRootFolder();
+    currentWorkingDir = "C:\\Users\\evond\\git\\triplea\\game-app\\ai"; // \\src\\main\\java";
+    final File rootFile = new File(currentWorkingDir).getParentFile().getParentFile();
+    final int totalSum = countStringsIn(rootFile);
+
+    assertEquals(100, totalSum);
+  }
 
   @NonNls
   private static String errorTextNotTranslated(
@@ -48,7 +104,7 @@ class I18nResourceBundleTest {
   @Test
   void i18nGetText() {
     final I18nResourceBundle i18nBundle = I18nTestBundle.get();
-    assertEquals("Test Text: Happy Testing", i18nBundle.getText("test.Text"));
+    assertEquals("Test Text: Happy Testing", i18nBundle.getString("test.Text"));
   }
 
   /**
