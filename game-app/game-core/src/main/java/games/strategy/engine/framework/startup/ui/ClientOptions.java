@@ -1,5 +1,7 @@
 package games.strategy.engine.framework.startup.ui;
 
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -28,7 +30,10 @@ public class ClientOptions extends JDialog {
       final String defaultName,
       final int defaultPort,
       final String defaultAddress) {
-    super(JOptionPane.getFrameForComponent(parent), "Client options", true);
+    super(
+        JOptionPane.getFrameForComponent(parent),
+        I18nEngineFramework.get().getString("startup.ClientOptions.Title"),
+        true);
     initComponents();
     layoutComponents();
     nameField.setText(defaultName);
@@ -63,10 +68,11 @@ public class ClientOptions extends JDialog {
   }
 
   private void layoutComponents() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final Container content = getContentPane();
     content.setLayout(new BorderLayout());
     final JPanel title = new JPanel();
-    title.add(new JLabel("Select client options"));
+    title.add(new JLabel(bundle.getString("startup.ClientOptions.pnl.Title")));
     content.add(title, BorderLayout.NORTH);
     final Insets labelSpacing = new Insets(3, 7, 0, 0);
     final Insets fieldSpacing = new Insets(3, 5, 0, 7);
@@ -81,9 +87,10 @@ public class ClientOptions extends JDialog {
     final JPanel fields = new JPanel();
     final GridBagLayout layout = new GridBagLayout();
     fields.setLayout(layout);
-    final JLabel nameLabel = new JLabel("Name:");
-    final JLabel portLabel = new JLabel("Server Port:");
-    final JLabel addressLabel = new JLabel("Server Address:");
+    final JLabel nameLabel = new JLabel(bundle.getString("startup.ClientOptions.lbl.Name"));
+    final JLabel portLabel = new JLabel(bundle.getString("startup.ClientOptions.lbl.ServerPort"));
+    final JLabel addressLabel =
+        new JLabel(bundle.getString("startup.ClientOptions.lbl.ServerAddress"));
     layout.setConstraints(portLabel, labelConstraints);
     layout.setConstraints(nameLabel, labelConstraints);
     layout.setConstraints(addressLabel, labelConstraints);
@@ -101,12 +108,13 @@ public class ClientOptions extends JDialog {
     buttons.add(
         new JButton(
             SwingAction.of(
-                "Connect",
+                bundle.getString("startup.ClientOptions.btn.Connect"),
                 e -> {
                   setVisible(false);
                   okPressed = true;
                 })));
-    buttons.add(new JButton(SwingAction.of("Cancel", e -> setVisible(false))));
+    buttons.add(
+        new JButton(SwingAction.of(bundle.getString("Option.Cancel"), e -> setVisible(false))));
     content.add(buttons, BorderLayout.SOUTH);
   }
 

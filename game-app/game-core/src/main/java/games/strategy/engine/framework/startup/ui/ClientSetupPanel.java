@@ -1,6 +1,8 @@
 package games.strategy.engine.framework.startup.ui;
 
 import games.strategy.engine.chat.ChatPanel;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.startup.launcher.ILauncher;
 import games.strategy.engine.framework.startup.mc.ClientModel;
 import games.strategy.engine.framework.startup.mc.IRemoteModelListener;
@@ -10,6 +12,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +34,8 @@ import org.triplea.swing.SwingAction;
 /** Network client game staging panel, can be used to select sides and chat. */
 public class ClientSetupPanel extends SetupPanel {
   private static final long serialVersionUID = 6942605803526295372L;
+  private static final String PLAY_TEXT =
+      I18nEngineFramework.get().getString("startup.ClientSetupPanel.str.PlayText");
   private final Insets buttonInsets = new Insets(0, 0, 0, 0);
   private final ClientModel clientModel;
   private final List<PlayerRow> playerRows = new ArrayList<>();
@@ -79,6 +84,7 @@ public class ClientSetupPanel extends SetupPanel {
   }
 
   private void layoutComponents() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     removeAll();
     setLayout(new BorderLayout());
     final JPanel info = new JPanel();
@@ -116,23 +122,25 @@ public class ClientSetupPanel extends SetupPanel {
     allianceConstraints.gridx = gridx;
     allianceConstraints.insets = lastSpacing;
     if (!disableable) {
-      final JLabel enableLabel = new JLabel("Use");
+      final JLabel enableLabel =
+          new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Enable"));
       enableLabel.setForeground(Color.black);
       layout.setConstraints(enableLabel, enabledPlayerConstraints);
       players.add(enableLabel);
     }
-    final JLabel nameLabel = new JLabel("Name");
+    final JLabel nameLabel = new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Name"));
     nameLabel.setForeground(Color.black);
     layout.setConstraints(nameLabel, nameConstraints);
     players.add(nameLabel);
-    final JLabel playerLabel = new JLabel("Played By");
+    final JLabel playerLabel = new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Player"));
     playerLabel.setForeground(Color.black);
     layout.setConstraints(playerLabel, playerConstraints);
     players.add(playerLabel);
     final JLabel playedByLabel = new JLabel("                    ");
     layout.setConstraints(playedByLabel, playConstraints);
     players.add(playedByLabel);
-    final JLabel allianceLabel = new JLabel("Alliance");
+    final JLabel allianceLabel =
+        new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Alliance"));
     layout.setConstraints(allianceLabel, allianceConstraints);
     players.add(allianceLabel);
     for (final PlayerRow row : playerRows) {
@@ -206,7 +214,6 @@ public class ClientSetupPanel extends SetupPanel {
   }
 
   class PlayerRow {
-    private static final String PLAY_TEXT = "Play";
     private final JCheckBox enabledCheckBox = new JCheckBox();
     private final JLabel playerNameLabel = new JLabel();
     private final JLabel playerLabel = new JLabel();
@@ -216,7 +223,10 @@ public class ClientSetupPanel extends SetupPanel {
     private final Action takeAction =
         SwingAction.of(PLAY_TEXT, e -> clientModel.takePlayer(playerNameLabel.getText()));
     private final Action dontTakeAction =
-        SwingAction.of("Don't Play", e -> clientModel.releasePlayer(playerNameLabel.getText()));
+        SwingAction.of(
+            I18nEngineFramework.get()
+                .getString("startup.ClientSetupPanel.PlayerRow.actn.DontTakeAction"),
+            e -> clientModel.releasePlayer(playerNameLabel.getText()));
 
     private final ActionListener disablePlayerActionListener =
         e -> {
@@ -277,12 +287,16 @@ public class ClientSetupPanel extends SetupPanel {
     }
 
     public void update(final UserName userName, final boolean disableable) {
+      final I18nResourceBundle bundle = I18nEngineFramework.get();
       if (userName == null) {
         playerLabel.setText("-");
         final JButton button = new JButton(takeAction);
         button.setMargin(buttonInsets);
         playerComponent = button;
-        alliance.setToolTipText("Click to play " + alliance.getText());
+        alliance.setToolTipText(
+            MessageFormat.format(
+                bundle.getString("startup.ClientSetupPanel.btn.Alliance.tltp.Play"),
+                alliance.getText()));
         allianceComponent = alliance;
       } else {
         playerLabel.setText(userName.getValue());
@@ -290,7 +304,10 @@ public class ClientSetupPanel extends SetupPanel {
           final JButton button = new JButton(dontTakeAction);
           button.setMargin(buttonInsets);
           playerComponent = button;
-          alliance.setToolTipText("Click to release " + alliance.getText());
+          alliance.setToolTipText(
+              MessageFormat.format(
+                  bundle.getString("startup.ClientSetupPanel.btn.Alliance.tltp.Release"),
+                  alliance.getText()));
           allianceComponent = alliance;
         } else {
           playerComponent = new JLabel("");
