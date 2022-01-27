@@ -2,12 +2,13 @@ package games.strategy.engine.framework.startup.ui;
 
 import games.strategy.engine.data.GamePlayer;
 import games.strategy.engine.data.properties.GameProperties;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.startup.launcher.local.PlayerCountrySelection;
 import games.strategy.triplea.Constants;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
       final SetupPanel parent,
       final GameProperties gameProperties,
       final PlayerTypes playerTypes) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     this.disableable = disableable;
     this.parent = parent;
     playerName = player.getName();
@@ -58,20 +60,17 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
 
     enabledCheckBox = new JCheckBox();
     final ActionListener disablePlayerActionListener =
-        new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            if (enabledCheckBox.isSelected()) {
-              enabled = true;
-              // the 1st in the list should be human
-              PlayerSelectorRow.this.playerTypes.setSelectedItem(PlayerTypes.HUMAN_PLAYER);
-            } else {
-              enabled = false;
-              // the 2nd in the list should be Weak AI
-              PlayerSelectorRow.this.playerTypes.setSelectedItem(PlayerTypes.WEAK_AI);
-            }
-            setWidgetActivation();
+        e -> {
+          if (enabledCheckBox.isSelected()) {
+            enabled = true;
+            // the 1st in the list should be human
+            PlayerSelectorRow.this.playerTypes.setSelectedItem(PlayerTypes.HUMAN_PLAYER);
+          } else {
+            enabled = false;
+            // the 2nd in the list should be Weak AI
+            PlayerSelectorRow.this.playerTypes.setSelectedItem(PlayerTypes.WEAK_AI);
           }
+          setWidgetActivation();
         };
     enabledCheckBox.addActionListener(disablePlayerActionListener);
     enabledCheckBox.setSelected(playersEnablementListing.get(playerName));
@@ -79,7 +78,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
 
     this.playerTypes = new JComboBox<>(this.playerTypesProvider.getAvailablePlayerLabels());
     String previousSelection = reloadSelections.get(playerName);
-    if (previousSelection.equalsIgnoreCase("Client")) {
+    if (previousSelection.equalsIgnoreCase(bundle.getString("Player.Client"))) {
       previousSelection = PlayerTypes.HUMAN_PLAYER.getLabel();
     }
     if (List.of(this.playerTypesProvider.getAvailablePlayerLabels()).contains(previousSelection)) {
@@ -92,7 +91,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
     if (!playerAlliances.contains(playerName)) {
       final String alliancesLabelText = playerAlliances.toString();
       alliances = new JButton(alliancesLabelText);
-      alliances.setToolTipText("Click to play " + alliancesLabelText);
+      alliances.setToolTipText(bundle.getString("Button.Alliance.tltp.Play", alliancesLabelText));
       alliances.addActionListener(
           e ->
               playerRows.stream()
@@ -110,7 +109,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
     incomePercentageLabel = new JLabel("%");
     puIncomeBonus =
         gameProperties.getPlayerProperty(Constants.getPuIncomeBonus(player)).getEditorComponent();
-    puIncomeBonusLabel = new JLabel("PUs");
+    puIncomeBonusLabel = new JLabel(bundle.getString("Label.Pus"));
 
     setWidgetActivation();
   }

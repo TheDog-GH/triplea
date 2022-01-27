@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.ui;
 
 import feign.FeignException;
+import games.strategy.engine.framework.I18nEngineFramework;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -41,7 +42,10 @@ class LobbyWatcherKeepAliveTask implements Runnable {
         repostGame();
       }
     } catch (final FeignException e) {
-      log.info("Unable to connect to lobby (lobby is shut down?)", e);
+      log.info(
+          I18nEngineFramework.get()
+              .getString("startup.LobbyWatcherKeepAliveTask.info.UnableToConnect"),
+          e);
     }
   }
 
@@ -61,8 +65,7 @@ class LobbyWatcherKeepAliveTask implements Runnable {
 
   private void messageConnectivityCheckFails() {
     log.error(
-        "Failed to re-post game back to the lobby, connectivity check to your host "
-            + "failed. This is unexpected and means your host is no longer reachable from "
-            + "the public internet, your game is no longer listed on the lobby.");
+        I18nEngineFramework.get()
+            .getString("startup.LobbyWatcherKeepAliveTask.err.ConnectivityCheck"));
   }
 }

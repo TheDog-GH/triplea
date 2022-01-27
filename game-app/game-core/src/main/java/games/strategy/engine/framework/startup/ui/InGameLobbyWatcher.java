@@ -2,6 +2,7 @@ package games.strategy.engine.framework.startup.ui;
 
 import com.google.common.annotations.VisibleForTesting;
 import games.strategy.engine.data.GameDataEvent;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.IGame;
 import games.strategy.engine.framework.startup.SystemPropertyReader;
 import games.strategy.engine.framework.startup.WatcherThreadMessaging;
@@ -181,7 +182,9 @@ public class InGameLobbyWatcher {
           new InGameLobbyWatcher(
               serverMessenger, gameToLobbyConnection, watcherThreadMessaging, oldWatcher));
     } catch (final Exception e) {
-      log.error("Failed to create in-game lobby watcher", e);
+      log.error(
+          I18nEngineFramework.get().getString("startup.InGameLobbyWatcher.err.CreateInGameWatcher"),
+          e);
       return Optional.empty();
     }
   }
