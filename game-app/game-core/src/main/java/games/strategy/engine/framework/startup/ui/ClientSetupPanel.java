@@ -225,7 +225,7 @@ public class ClientSetupPanel extends SetupPanel {
     private final Action dontTakeAction =
         SwingAction.of(
             I18nEngineFramework.get()
-                .getString("startup.ClientSetupPanel.PlayerRow.actn.DontTakeAction"),
+                .getString("startup.ClientSetupPanel.PlayerRow.act.DontTakeAction"),
             e -> clientModel.releasePlayer(playerNameLabel.getText()));
 
     private final ActionListener disablePlayerActionListener =

@@ -44,7 +44,7 @@ class LobbyWatcherKeepAliveTask implements Runnable {
     } catch (final FeignException e) {
       log.info(
           I18nEngineFramework.get()
-              .getString("startup.LobbyWatcherKeepAliveTask.info.UnableToConnect"),
+              .getString("startup.LobbyWatcherKeepAliveTask.inf.UnableToConnect"),
           e);
     }
   }
