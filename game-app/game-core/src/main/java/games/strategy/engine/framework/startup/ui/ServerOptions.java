@@ -1,5 +1,7 @@
 package games.strategy.engine.framework.startup.ui;
 
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -35,7 +37,10 @@ public class ServerOptions extends JDialog {
       final UserName defaultName,
       final int defaultPort,
       final boolean showComment) {
-    super(owner == null ? null : JOptionPane.getFrameForComponent(owner), "Server options", true);
+    super(
+        owner == null ? null : JOptionPane.getFrameForComponent(owner),
+        I18nEngineFramework.get().getString("startup.ServerOptions.Title"),
+        true);
     this.showComment = showComment;
     initComponents();
     layoutComponents();
@@ -85,10 +90,11 @@ public class ServerOptions extends JDialog {
   }
 
   private void layoutComponents() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final Container content = getContentPane();
     content.setLayout(new BorderLayout());
     final JPanel title = new JPanel();
-    title.add(new JLabel("Select server options"));
+    title.add(new JLabel(bundle.getString("startup.ServerOptions.lbl.Title")));
     content.add(title, BorderLayout.NORTH);
     final Insets labelSpacing = new Insets(3, 7, 0, 0);
     final Insets fieldSpacing = new Insets(3, 5, 0, 7);
@@ -101,14 +107,15 @@ public class ServerOptions extends JDialog {
     fieldConstraints.gridx = 1;
     fieldConstraints.insets = fieldSpacing;
     requirePasswordCheckBox = new JCheckBox("");
-    final JLabel passwordRequiredLabel = new JLabel("Require Password:");
+    final JLabel passwordRequiredLabel =
+        new JLabel(bundle.getString("startup.ServerOptions.lbl.PasswordRequired"));
     final JPanel fields = new JPanel();
     final GridBagLayout layout = new GridBagLayout();
     fields.setLayout(layout);
-    final JLabel nameLabel = new JLabel("Name:");
-    final JLabel portLabel = new JLabel("Port:");
-    final JLabel passwordLabel = new JLabel("Password:");
-    final JLabel commentLabel = new JLabel("Comments:");
+    final JLabel nameLabel = new JLabel(bundle.getString("startup.ServerOptions.lbl.Name"));
+    final JLabel portLabel = new JLabel(bundle.getString("startup.ServerOptions.lbl.Port"));
+    final JLabel passwordLabel = new JLabel(bundle.getString("startup.ServerOptions.lbl.Password"));
+    final JLabel commentLabel = new JLabel(bundle.getString("startup.ServerOptions.lbl.Comments"));
     layout.setConstraints(portLabel, labelConstraints);
     layout.setConstraints(nameLabel, labelConstraints);
     layout.setConstraints(passwordLabel, labelConstraints);
@@ -136,12 +143,13 @@ public class ServerOptions extends JDialog {
     buttons.add(
         new JButton(
             SwingAction.of(
-                "OK",
+                bundle.getString("Option.OK"),
                 e -> {
                   setVisible(false);
                   okPressed = true;
                 })));
-    buttons.add(new JButton(SwingAction.of("Cancel", e -> setVisible(false))));
+    buttons.add(
+        new JButton(SwingAction.of(bundle.getString("Option.Cancel"), e -> setVisible(false))));
     content.add(buttons, BorderLayout.SOUTH);
   }
 

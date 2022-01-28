@@ -1,5 +1,6 @@
 package games.strategy.engine.framework.startup.ui;
 
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.player.Player;
 import games.strategy.triplea.TripleAPlayer;
 import games.strategy.triplea.ai.AiProvider;
@@ -19,8 +20,55 @@ public class PlayerTypes {
 
   public static final String DOES_NOTHING_PLAYER_LABEL = "Does Nothing (AI)";
 
-  public static final Type HUMAN_PLAYER =
-      new Type("Human") {
+  public static final Type WEAK_AI =
+      new Type(I18nEngineFramework.get().getString("Player.WeakAI")) {
+        @Override
+        public Player newPlayerWithName(final String name) {
+          return new WeakAi(name);
+        }
+      };
+  public static final Type FAST_AI =
+      new Type(I18nEngineFramework.get().getString("Player.FastAI")) {
+        @Override
+        public Player newPlayerWithName(final String name) {
+          return new FastAi(name);
+        }
+      };
+  public static final Type PRO_AI =
+      new Type(I18nEngineFramework.get().getString("Player.HardAI")) {
+        @Override
+        public Player newPlayerWithName(final String name) {
+          return new ProAi(name);
+        }
+      };
+  /** A 'dummy' player type used for battle calc. */
+  public static final Type BATTLE_CALC_DUMMY =
+      new Type(I18nEngineFramework.get().getString("Player.NoneAI"), false) {
+        @Override
+        public Player newPlayerWithName(final String name) {
+          throw new UnsupportedOperationException(
+              I18nEngineFramework.get()
+                  .getString("startup.PlayerTypes.err.InstantiateDummyPlayer"));
+        }
+      };
+
+  /**
+   * Converter function, each player type has a label, this method will convert from a given label
+   * value to the corresponding enum.
+   *
+   * @throws IllegalStateException Thrown if the given label does not match any in the current enum.
+   */
+  public Type fromLabel(final String label) {
+    return playerTypes.stream()
+        .filter(playerType -> playerType.getLabel().equals(label))
+        .findAny()
+        .orElseThrow(
+            () ->
+                new IllegalStateException(
+                    I18nEngineFramework.get()
+                        .getString("startup.PlayerTypes.err.FindPlayerType", label)));
+  }  public static final Type HUMAN_PLAYER =
+      new Type(I18nEngineFramework.get().getString("Player.Human")) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new TripleAPlayer(name) {
@@ -31,30 +79,12 @@ public class PlayerTypes {
           };
         }
       };
-  public static final Type WEAK_AI =
-      new Type("Easy (AI)") {
-        @Override
-        public Player newPlayerWithName(final String name) {
-          return new WeakAi(name);
-        }
-      };
-  public static final Type FAST_AI =
-      new Type("Fast (AI)") {
-        @Override
-        public Player newPlayerWithName(final String name) {
-          return new FastAi(name);
-        }
-      };
-  public static final Type PRO_AI =
-      new Type("Hard (AI)") {
-        @Override
-        public Player newPlayerWithName(final String name) {
-          return new ProAi(name);
-        }
-      };
+
+
+
   /** A hidden player type to represent network connected players. */
   public static final Type CLIENT_PLAYER =
-      new Type("Client", false) {
+      new Type(I18nEngineFramework.get().getString("Player.Client"), false) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new TripleAPlayer(name) {
@@ -63,16 +93,6 @@ public class PlayerTypes {
               return CLIENT_PLAYER;
             }
           };
-        }
-      };
-  /** A 'dummy' player type used for battle calc. */
-  public static final Type BATTLE_CALC_DUMMY =
-      new Type("None (AI)", false) {
-        @Override
-        public Player newPlayerWithName(final String name) {
-          throw new UnsupportedOperationException(
-              "Fail fast - bad configuration, should instantiate dummy player "
-                  + "type only for battle calc");
         }
       };
 
@@ -101,18 +121,7 @@ public class PlayerTypes {
     return playerTypes.stream().filter(Type::isVisible).map(Type::getLabel).toArray(String[]::new);
   }
 
-  /**
-   * Converter function, each player type has a label, this method will convert from a given label
-   * value to the corresponding enum.
-   *
-   * @throws IllegalStateException Thrown if the given label does not match any in the current enum.
-   */
-  public Type fromLabel(final String label) {
-    return playerTypes.stream()
-        .filter(playerType -> playerType.getLabel().equals(label))
-        .findAny()
-        .orElseThrow(() -> new IllegalStateException("could not find PlayerType: " + label));
-  }
+
 
   /**
    * PlayerType indicates what kind of entity is controlling a player, whether an AI, human, or a

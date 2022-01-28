@@ -122,13 +122,12 @@ public class ClientSetupPanel extends SetupPanel {
     allianceConstraints.gridx = gridx;
     allianceConstraints.insets = lastSpacing;
     if (!disableable) {
-      final JLabel enableLabel =
-          new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Enable"));
+      final JLabel enableLabel = new JLabel(bundle.getString("Label.Enable"));
       enableLabel.setForeground(Color.black);
       layout.setConstraints(enableLabel, enabledPlayerConstraints);
       players.add(enableLabel);
     }
-    final JLabel nameLabel = new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Name"));
+    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
     nameLabel.setForeground(Color.black);
     layout.setConstraints(nameLabel, nameConstraints);
     players.add(nameLabel);
@@ -306,8 +305,7 @@ public class ClientSetupPanel extends SetupPanel {
           playerComponent = button;
           alliance.setToolTipText(
               MessageFormat.format(
-                  bundle.getString("startup.ClientSetupPanel.btn.Alliance.tltp.Release"),
-                  alliance.getText()));
+                  bundle.getString("Button.Alliance.tltp.Release"), alliance.getText()));
           allianceComponent = alliance;
         } else {
           playerComponent = new JLabel("");

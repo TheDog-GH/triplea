@@ -2,6 +2,8 @@ package games.strategy.engine.framework.startup.ui;
 
 import com.google.common.collect.ImmutableList;
 import games.strategy.engine.data.GamePlayer;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.network.ui.BanPlayerAction;
 import games.strategy.engine.framework.network.ui.BootPlayerAction;
 import games.strategy.engine.framework.network.ui.SetPasswordAction;
@@ -19,7 +21,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,10 +88,11 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
   }
 
   private void layoutComponents() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     setLayout(new BorderLayout());
     info.setLayout(new GridBagLayout());
     info.add(
-        new JLabel("Name:"),
+        new JLabel(bundle.getString("startup.ServerSetupOptions.Name")),
         new GridBagConstraints(
             0,
             0,
@@ -104,7 +106,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
             0,
             0));
     info.add(
-        new JLabel("Address:"),
+        new JLabel(bundle.getString("startup.ServerSetupOptions.Address")),
         new GridBagConstraints(
             0,
             1,
@@ -118,7 +120,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
             0,
             0));
     info.add(
-        new JLabel("Port:"),
+        new JLabel(bundle.getString("startup.ServerSetupOptions.Port")),
         new GridBagConstraints(
             0,
             2,
@@ -177,6 +179,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
   }
 
   private void layoutPlayers() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final JPanel players = new JPanel();
     final GridBagLayout layout = new GridBagLayout();
     players.setLayout(layout);
@@ -213,33 +216,35 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
     allianceConstraints.gridx = gridx;
     allianceConstraints.insets = lastSpacing;
     if (disableable) {
-      final JLabel enableLabel = new JLabel("Use");
+      final JLabel enableLabel = new JLabel(bundle.getString("Label.Enable"));
       enableLabel.setForeground(Color.black);
       layout.setConstraints(enableLabel, enabledPlayerConstraints);
       players.add(enableLabel);
     }
-    final JLabel nameLabel = new JLabel("Name");
+    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
     nameLabel.setForeground(Color.black);
     layout.setConstraints(nameLabel, nameConstraints);
     players.add(nameLabel);
-    final JLabel playedByLabel = new JLabel("Played by");
+    final JLabel playedByLabel =
+        new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.PlayedBy"));
     playedByLabel.setForeground(Color.black);
     layout.setConstraints(playedByLabel, playerConstraints);
     players.add(playedByLabel);
-    final JLabel localLabel = new JLabel("Local");
+    final JLabel localLabel = new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.Local"));
     localLabel.setForeground(Color.black);
     layout.setConstraints(localLabel, localConstraints);
     players.add(localLabel);
-    final JLabel typeLabel = new JLabel("Type");
+    final JLabel typeLabel = new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.Type"));
     typeLabel.setForeground(Color.black);
     layout.setConstraints(typeLabel, typeConstraints);
     players.add(typeLabel);
-    final JLabel allianceLabel = new JLabel("Alliance");
+    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
     allianceLabel.setForeground(Color.black);
     layout.setConstraints(allianceLabel, allianceConstraints);
     players.add(allianceLabel);
     if (playerRows.isEmpty()) {
-      final JLabel noPlayers = new JLabel("Load a game file first");
+      final JLabel noPlayers =
+          new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.NoPlayers"));
       layout.setConstraints(noPlayers, nameConstraints);
       players.add(noPlayers);
     }
@@ -367,58 +372,29 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
     private final JCheckBox enabledCheckBox;
     private final JComboBox<String> type;
     private final JButton alliance;
-    private final ActionListener localPlayerActionListener =
-        new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            if (localCheckBox.isSelected()) {
-              model.takePlayer(nameLabel.getText());
-            } else {
-              model.releasePlayer(nameLabel.getText());
-            }
-            setWidgetActivation();
-          }
-        };
-    private final ActionListener disablePlayerActionListener =
-        new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            if (enabledCheckBox.isSelected()) {
-              model.enablePlayer(nameLabel.getText());
-              type.setSelectedItem(PlayerTypes.HUMAN_PLAYER);
-            } else {
-              model.disablePlayer(nameLabel.getText());
-              type.setSelectedItem(PlayerTypes.WEAK_AI);
-            }
-            setWidgetActivation();
-          }
-        };
 
     PlayerRow(
         final String playerName,
         final Map<String, String> reloadSelections,
         final Collection<String> playerAlliances,
         final PlayerTypes playerTypesProvider) {
+      final I18nResourceBundle bundle = I18nEngineFramework.get();
       nameLabel = new JLabel(playerName);
       playerLabel = new JLabel(model.getMessenger().getLocalNode().getName());
-      localCheckBox = new JCheckBox();
-      localCheckBox.addActionListener(localPlayerActionListener);
-      localCheckBox.setSelected(true);
-      enabledCheckBox = new JCheckBox();
-      enabledCheckBox.addActionListener(disablePlayerActionListener);
-      // this gets updated later
-      enabledCheckBox.setSelected(true);
+      // get variable type
       final String[] playerTypes = playerTypesProvider.getAvailablePlayerLabels();
       type = new JComboBox<>(playerTypes);
       String previousSelection = reloadSelections.get(playerName);
-      if (previousSelection.equalsIgnoreCase("Client")) {
+      if (previousSelection.equalsIgnoreCase(bundle.getString("Player.Client"))) {
         previousSelection = playerTypes[0];
       }
-      if (!previousSelection.equals("no_one") && List.of(playerTypes).contains(previousSelection)) {
+      if (!previousSelection.equals(bundle.getString("Player.NoOne"))
+          && List.of(playerTypes).contains(previousSelection)) {
         type.setSelectedItem(previousSelection);
         model.setLocalPlayerType(
             nameLabel.getText(), playerTypesProvider.fromLabel((String) type.getSelectedItem()));
-      } else if (playerName.startsWith("Neutral") || playerName.startsWith("AI")) {
+      } else if (playerName.startsWith(bundle.getString("Player.StartNeutral"))
+          || playerName.startsWith("AI")) {
         // the 4th in the list should be Pro AI (Hard AI)
         type.setSelectedItem(PlayerTypes.PRO_AI.getLabel());
         model.setLocalPlayerType(nameLabel.getText(), PlayerTypes.PRO_AI);
@@ -428,24 +404,55 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
         alliance.setVisible(false);
       } else {
         alliance = new JButton(playerAlliances.toString());
-        alliance.setToolTipText("Click to play " + playerAlliances.toString());
+        alliance.setToolTipText(
+            bundle.getString("Button.Alliance.tltp.Play", playerAlliances.toString()));
       }
       type.addActionListener(
           e ->
               model.setLocalPlayerType(
                   nameLabel.getText(),
                   playerTypesProvider.fromLabel((String) type.getSelectedItem())));
+
+      localCheckBox = new JCheckBox();
+      ActionListener localPlayerActionListener =
+          e -> {
+            if (localCheckBox.isSelected()) {
+              model.takePlayer(nameLabel.getText());
+            } else {
+              model.releasePlayer(nameLabel.getText());
+            }
+            setWidgetActivation();
+          };
+      localCheckBox.addActionListener(localPlayerActionListener);
+      localCheckBox.setSelected(true);
+      enabledCheckBox = new JCheckBox();
+      ActionListener disablePlayerActionListener =
+          e -> {
+            if (enabledCheckBox.isSelected()) {
+              model.enablePlayer(nameLabel.getText());
+              type.setSelectedItem(PlayerTypes.HUMAN_PLAYER);
+            } else {
+              model.disablePlayer(nameLabel.getText());
+              type.setSelectedItem(PlayerTypes.WEAK_AI);
+            }
+            setWidgetActivation();
+          };
+      enabledCheckBox.addActionListener(disablePlayerActionListener);
+      // this gets updated later
+      enabledCheckBox.setSelected(true);
     }
 
     public void takePlayerAction() {
       model.takePlayer(nameLabel.getText());
-      alliance.setToolTipText("Click to release " + alliance.getText());
+      alliance.setToolTipText(
+          I18nEngineFramework.get().getString("Button.Alliance.tltp.Release", alliance.getText()));
       setWidgetActivation();
     }
 
     public void releasePlayerAction() {
       model.releasePlayer(nameLabel.getText());
-      alliance.setToolTipText("Click to play " + alliance.getText());
+      alliance.setToolTipText(
+          I18nEngineFramework.get().getString("Button.Alliance.tltp.Play", alliance.getText()));
       setWidgetActivation();
     }
 
