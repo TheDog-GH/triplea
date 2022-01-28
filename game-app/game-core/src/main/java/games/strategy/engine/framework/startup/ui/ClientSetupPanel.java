@@ -138,8 +138,7 @@ public class ClientSetupPanel extends SetupPanel {
     final JLabel playedByLabel = new JLabel("                    ");
     layout.setConstraints(playedByLabel, playConstraints);
     players.add(playedByLabel);
-    final JLabel allianceLabel =
-        new JLabel(bundle.getString("startup.ClientSetupPanel.lbl.Alliance"));
+    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
     layout.setConstraints(allianceLabel, allianceConstraints);
     players.add(allianceLabel);
     for (final PlayerRow row : playerRows) {

@@ -2,6 +2,8 @@ package games.strategy.engine.framework.startup.ui;
 
 import games.strategy.engine.data.GamePlayer;
 import games.strategy.engine.data.GameState;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -51,11 +53,12 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
 
   public void layoutPlayerComponents(
       final JPanel panel, final List<PlayerSelectorRow> playerRows, final GameState data) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     panel.removeAll();
     playerRows.clear();
     panel.setLayout(new GridBagLayout());
     if (data == null) {
-      panel.add(new JLabel("No game selected!"));
+      panel.add(new JLabel(bundle.getString("startup.SetupPanel.lbl.NoGameSelected")));
       return;
     }
 
@@ -68,7 +71,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
     int gridx = 0;
     int gridy = 1;
     if (!disableable.isEmpty() || playersEnablementListing.containsValue(Boolean.FALSE)) {
-      final JLabel enableLabel = new JLabel("Use");
+      final JLabel enableLabel = new JLabel(bundle.getString("Label.Enable"));
       panel.add(
           enableLabel,
           new GridBagConstraints(
@@ -84,7 +87,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
               0,
               0));
     }
-    final JLabel setAllTypesLabel = new JLabel("Set All To:");
+    final JLabel setAllTypesLabel = new JLabel(bundle.getString("startup.SetupPanel.lbl.SetAllTo"));
     panel.add(
         setAllTypesLabel,
         new GridBagConstraints(
@@ -99,7 +102,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel nameLabel = new JLabel("Name");
+    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
     panel.add(
         nameLabel,
         new GridBagConstraints(
@@ -132,7 +135,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel typeLabel = new JLabel("Type");
+    final JLabel typeLabel = new JLabel(bundle.getString("startup.SetupPanel.lbl.Type"));
     panel.add(
         typeLabel,
         new GridBagConstraints(
@@ -147,7 +150,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(0, 5, 5, 0),
             0,
             0));
-    final JLabel allianceLabel = new JLabel("Alliance");
+    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
     panel.add(
         allianceLabel,
         new GridBagConstraints(
@@ -177,7 +180,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel incomeLabel = new JLabel("Income");
+    final JLabel incomeLabel = new JLabel(bundle.getString("startup.SetupPanel.lbl.Income"));
     panel.add(
         incomeLabel,
         new GridBagConstraints(
@@ -194,7 +197,8 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             0));
     incomeLabel.setVisible(false);
     gridx++;
-    final JLabel puIncomeBonusLabel = new JLabel("Bonus Income");
+    final JLabel puIncomeBonusLabel =
+        new JLabel(bundle.getString("startup.SetupPanel.lbl.BonusIncome"));
     panel.add(
         puIncomeBonusLabel,
         new GridBagConstraints(
@@ -233,7 +237,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
 
     resourceModifiers.setAction(
         SwingAction.of(
-            "Resource Modifiers",
+            bundle.getString("startup.SetupPanel.act.ResourceModifiers"),
             e -> {
               final boolean isVisible = incomeLabel.isVisible();
               incomeLabel.setVisible(!isVisible);
