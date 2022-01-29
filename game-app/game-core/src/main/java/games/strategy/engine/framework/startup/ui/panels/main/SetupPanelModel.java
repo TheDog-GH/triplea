@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static games.strategy.engine.framework.CliProperties.SERVER_PASSWORD;
 
 import com.google.common.base.Preconditions;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.startup.login.ClientLoginValidator;
 import games.strategy.engine.framework.startup.mc.ClientModel;
 import games.strategy.engine.framework.startup.mc.HeadedLaunchAction;
@@ -74,7 +75,11 @@ public class SetupPanelModel implements ServerSetupModel {
         this,
         ui,
         new HeadedLaunchAction(ui),
-        error -> SwingComponents.showError(null, "Connection problem", error));
+        error ->
+            SwingComponents.showError(
+                null,
+                I18nEngineFramework.get().getString("startup.SetupPanelModel.err.Connection.Ttl"),
+                error));
   }
 
   @Override

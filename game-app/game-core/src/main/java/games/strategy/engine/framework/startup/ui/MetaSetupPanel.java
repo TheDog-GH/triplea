@@ -35,14 +35,14 @@ public class MetaSetupPanel extends SetupPanel {
   public MetaSetupPanel(final SetupPanelModel model) {
     final I18nResourceBundle bundle = I18nEngineFramework.get();
     final JButton connectToLobby =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayOnline.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayOnline.Txt"))
             .biggerFont()
             .toolTipText(
                 HtmlUtils.getHtml(bundle.getString("startup.MetaSetupPanel.btn.PlayOnline.Tltp")))
             .actionListener(model::login)
             .build();
     final JButton startLocal =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.StartLocalGame.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.StartLocalGame.Txt"))
             .toolTipText(
                 HtmlUtils.getHtml(
                     bundle.getString("startup.MetaSetupPanel.btn.StartLocalGame.Tltp")))
@@ -50,19 +50,19 @@ public class MetaSetupPanel extends SetupPanel {
             .build();
 
     final JButton startPbf =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayByForum.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayByForum.Txt"))
             .toolTipText(
                 HtmlUtils.getHtml(bundle.getString("startup.MetaSetupPanel.btn.PlayByForum.Tltp")))
             .actionListener(model::showPbf)
             .build();
     final JButton startPbem =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayByEmail.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.PlayByEmail.Txt"))
             .toolTipText(
                 HtmlUtils.getHtml(bundle.getString("startup.MetaSetupPanel.btn.PlayByEmail.Tltp")))
             .actionListener(model::showPbem)
             .build();
     final JButton hostGame =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.HostNetworkGame.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.HostNetworkGame.Txt"))
             .toolTipText(
                 HtmlUtils.getHtml(
                     bundle.getString("startup.MetaSetupPanel.btn.PlayOnline.HostNetworkGame.Tltp")))
@@ -70,7 +70,7 @@ public class MetaSetupPanel extends SetupPanel {
             .build();
     final JButton connectToHostedGame =
         new JButtonBuilder(
-                bundle.getString("startup.MetaSetupPanel.btn.ConnectToNetworkedGame.Lbl"))
+                bundle.getString("startup.MetaSetupPanel.btn.ConnectToNetworkedGame.Txt"))
             .toolTipText(
                 HtmlUtils.getHtml(
                     bundle.getString(
@@ -78,19 +78,19 @@ public class MetaSetupPanel extends SetupPanel {
             .actionListener(() -> new Thread(model::showClient).start())
             .build();
     final JButton enginePreferences =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.EnginePreferences.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.EnginePreferences.Txt"))
             .toolTipText(bundle.getString("startup.MetaSetupPanel.btn.EnginePreferences.Tltp"))
             .actionListener(
                 () -> ClientSetting.showSettingsWindow(JOptionPane.getFrameForComponent(this)))
             .build();
     final JButton userGuideButton =
-        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.UserGuideHelp.Lbl"))
+        new JButtonBuilder(bundle.getString("startup.MetaSetupPanel.btn.UserGuideHelp.Txt"))
             .actionListener(
                 () -> SwingComponents.newOpenUrlConfirmationDialog(UrlConstants.USER_GUIDE))
             .build();
     final JButton mapCreator =
         new JButtonBuilder()
-            .title(bundle.getString("startup.MetaSetupPanel.btn.MapCreatorTools.Lbl"))
+            .title(bundle.getString("startup.MetaSetupPanel.btn.MapCreatorTools.Txt"))
             .actionListener(MapCreator::openMapCreatorWindow)
             .build();
 

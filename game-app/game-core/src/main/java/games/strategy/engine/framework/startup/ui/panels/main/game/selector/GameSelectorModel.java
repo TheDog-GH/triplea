@@ -7,6 +7,7 @@ import games.strategy.engine.data.gameparser.GameParser;
 import games.strategy.engine.data.gameparser.GameParsingValidation;
 import games.strategy.engine.framework.GameDataManager;
 import games.strategy.engine.framework.GameShutdownRegistry;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.startup.mc.ClientModel;
 import games.strategy.engine.framework.startup.mc.GameSelector;
 import games.strategy.triplea.settings.ClientSetting;
@@ -49,37 +50,21 @@ public class GameSelectorModel extends Observable implements GameSelector {
     this.gameParser = GameParser::parse;
   }
 
-  /**
-   * Loads game data by parsing a given file.
-   *
-   * @return True if successfully loaded, otherwise false.
-   */
-  public boolean load(final Path xmlFile) {
-    Preconditions.checkArgument(
-        Files.exists(xmlFile),
-        "Programming error, expected file to have already been checked to exist: "
-            + xmlFile.toAbsolutePath());
+  @SuppressWarnings("ReturnValueIgnored")
+  private static boolean gameUriExistsOnFileSystem(final String gameUri) {
+    try {
+      final Path gameFile = Path.of(gameUri);
 
-    // if the file name is xml, load it as a new game
-    if (xmlFile.getFileName().toString().toLowerCase().endsWith("xml")) {
-      fileName = null;
-      GameData gameData = parseAndValidate(xmlFile);
-      if (gameData != null && gameData.getGameName() == null) {
-        gameData = null;
-      }
-      setGameData(gameData);
-      this.setDefaultGame(xmlFile, gameData);
-      return gameData != null;
-    } else {
-      // try to load it as a saved game whatever the extension
-      final GameData newData = GameDataManager.loadGame(xmlFile).orElse(null);
-      if (newData == null) {
-        return false;
-      }
-      newData.setSaveGameFileName(xmlFile.getFileName().toString());
-      this.fileName = xmlFile.getFileName().toString();
-      setGameData(newData);
-      return true;
+      // starts with check is because we don't want to load a game file by default that is not
+      // within
+      // the map folders. (ie: if a previous version of triplea was using running a game within its
+      // root folder, we shouldn't open it)
+      return Files.exists(gameFile)
+          && gameFile.startsWith(ClientFileSystemHelper.getUserRootFolder());
+    } catch (final IllegalArgumentException e) {
+      log.info(
+          I18nEngineFramework.get().getString("startup.GameSelectorModel.inf.LoadUri", gameUri), e);
+      return false;
     }
   }
 
@@ -99,22 +84,37 @@ public class GameSelectorModel extends Observable implements GameSelector {
     setDefaultGame(null, null);
   }
 
-  @Nullable
-  private GameData parseAndValidate(final Path file) {
-    final GameData gameData = gameParser.apply(file).orElse(null);
-    if (gameData == null) {
-      return null;
-    }
-    final List<String> validationErrors = new GameParsingValidation(gameData).validate();
+  /**
+   * Loads game data by parsing a given file.
+   *
+   * @return True if successfully loaded, otherwise false.
+   */
+  public boolean load(final Path xmlFile) {
+    Preconditions.checkArgument(
+        Files.exists(xmlFile),
+        I18nEngineFramework.get()
+            .getString("startup.GameSelectorModel.err.FileExists", xmlFile.toAbsolutePath()));
 
-    if (validationErrors.isEmpty()) {
-      return gameData;
+    // if the file name is xml, load it as a new game
+    if (xmlFile.getFileName().toString().toLowerCase().endsWith("xml")) {
+      fileName = null;
+      GameData gameDataLoaded = parseAndValidate(xmlFile);
+      if (gameDataLoaded != null && gameDataLoaded.getGameName() == null) {
+        gameDataLoaded = null;
+      }
+      setGameData(gameDataLoaded);
+      this.setDefaultGame(xmlFile, gameDataLoaded);
+      return gameDataLoaded != null;
     } else {
-      log.error(
-          "Validation errors parsing game-XML file: {}, errors:\n{}",
-          file.toAbsolutePath(),
-          String.join("\n", validationErrors));
-      return null;
+      // try to load it as a saved game whatever the extension
+      final GameData newData = GameDataManager.loadGame(xmlFile).orElse(null);
+      if (newData == null) {
+        return false;
+      }
+      newData.setSaveGameFileName(xmlFile.getFileName().toString());
+      this.fileName = xmlFile.getFileName().toString();
+      setGameData(newData);
+      return true;
     }
   }
 
@@ -186,20 +186,24 @@ public class GameSelectorModel extends Observable implements GameSelector {
         .ifPresentOrElse(this::load, this::resetDefaultGame);
   }
 
-  @SuppressWarnings("ReturnValueIgnored")
-  private static boolean gameUriExistsOnFileSystem(final String gameUri) {
-    try {
-      final Path gameFile = Path.of(gameUri);
+  @Nullable
+  private GameData parseAndValidate(final Path file) {
+    final GameData gameDataParsed = gameParser.apply(file).orElse(null);
+    if (gameDataParsed == null) {
+      return null;
+    }
+    final List<String> validationErrors = new GameParsingValidation(gameDataParsed).validate();
 
-      // starts with check is because we don't want to load a game file by default that is not
-      // within
-      // the map folders. (ie: if a previous version of triplea was using running a game within its
-      // root folder, we shouldn't open it)
-      return Files.exists(gameFile)
-          && gameFile.startsWith(ClientFileSystemHelper.getUserRootFolder());
-    } catch (final IllegalArgumentException e) {
-      log.info("Default game uri {} could not be loaded", gameUri, e);
-      return false;
+    if (validationErrors.isEmpty()) {
+      return gameDataParsed;
+    } else {
+      log.error(
+          I18nEngineFramework.get()
+              .getString(
+                  "startup.GameSelectorModel.err.ParseXml",
+                  file.toAbsolutePath(),
+                  String.join("\n", validationErrors)));
+      return null;
     }
   }
 }

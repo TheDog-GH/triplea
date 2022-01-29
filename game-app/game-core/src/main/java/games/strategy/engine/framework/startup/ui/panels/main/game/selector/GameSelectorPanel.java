@@ -83,13 +83,13 @@ public final class GameSelectorPanel extends JPanel implements Observer {
   private void initButtons(final GameSelectorModel model) {
     final I18nResourceBundle bundle = I18nEngineFramework.get();
 
-    loadSavedGame.setText(bundle.getString("startup.GameSelectorPanel.btn.OpenSavedGame.Lbl"));
+    loadSavedGame.setText(bundle.getString("startup.GameSelectorPanel.btn.OpenSavedGame.Txt"));
     loadSavedGame.setToolTipText(
         bundle.getString("startup.GameSelectorPanel.btn.OpenSavedGame.Tltp"));
-    loadNewGame.setText(bundle.getString("startup.GameSelectorPanel.btn.SelectGame.Lbl"));
+    loadNewGame.setText(bundle.getString("startup.GameSelectorPanel.btn.SelectGame.Txt"));
     loadNewGame.setToolTipText(
         HtmlUtils.getHtml(bundle.getString("startup.GameSelectorPanel.btn.SelectGame.Tltp")));
-    mapOptions.setText(bundle.getString("startup.GameSelectorPanel.btn.GameOptions.Lbl"));
+    mapOptions.setText(bundle.getString("startup.GameSelectorPanel.btn.GameOptions.Txt"));
     mapOptions.setToolTipText(
         HtmlUtils.getHtml(bundle.getString("startup.GameSelectorPanel.btn.GameOptions.Tltp")));
 
@@ -210,7 +210,7 @@ public final class GameSelectorPanel extends JPanel implements Observer {
 
     final JButton downloadMapButton =
         new JButtonBuilder()
-            .title(bundle.getString("startup.GameSelectorPanel.btn.DownloadMaps.Lbl"))
+            .title(bundle.getString("startup.GameSelectorPanel.btn.DownloadMaps.Txt"))
             .toolTip(bundle.getString("startup.GameSelectorPanel.btn.DownloadMaps.Tltp"))
             .actionListener(DownloadMapsWindow::showDownloadMapsWindow)
             .build();

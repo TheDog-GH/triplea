@@ -1,6 +1,9 @@
 package games.strategy.engine.framework.startup.ui.panels.main;
 
 import games.strategy.engine.chat.ChatPanel;
+import games.strategy.engine.framework.HtmlUtils;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.startup.ui.SetupPanel;
 import games.strategy.engine.framework.startup.ui.panels.main.game.selector.GameSelectorPanel;
 import java.awt.BorderLayout;
@@ -37,18 +40,11 @@ public class MainPanel extends JPanel {
   private static final long serialVersionUID = -5548760379892913464L;
   private static final Dimension initialSize = new Dimension(900, 780);
 
-  private final JButton playButton =
-      new JButtonBuilder()
-          .title("Play")
-          .toolTip(
-              "<html>Start your game! <br>"
-                  + "If not enabled, then you must select a way to play your game first: <br>"
-                  + "Play Online, or Local Game, or PBEM, or Host Networked.</html>")
-          .build();
-  private final JButton cancelButton = new JButtonBuilder().title("Cancel").build();
+  private final JButton playButton;
+  private final JButton cancelButton;
 
   private final JPanel gameSetupPanelHolder = new JPanelBuilder().borderLayout().build();
-  private final JPanel mainPanel;
+  private final JPanel coreMainPanel;
   private final JSplitPane chatSplit;
   private final JPanel chatPanelHolder = new JPanelBuilder().height(62).borderLayout().build();
   private SetupPanel gameSetupPanel;
@@ -63,7 +59,16 @@ public class MainPanel extends JPanel {
       final Consumer<MainPanel> launchAction,
       @Nullable final ChatModel chatModel,
       final Runnable cancelAction) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+    playButton =
+        new JButtonBuilder()
+            .title(bundle.getString("startup.MainPanel.btn.Play.Txt"))
+            .toolTip(HtmlUtils.getHtml(bundle.getString("startup.MainPanel.btn.Play.Tltp")))
+            .build();
     playButton.addActionListener(e -> launchAction.accept(this));
+
+    cancelButton =
+        new JButtonBuilder().title(bundle.getString("startup.MainPanel.btn.Cancel")).build();
     cancelButton.addActionListener(e -> cancelAction.run());
 
     gameSelectorPanel.setBorder(new EtchedBorder());
@@ -75,15 +80,15 @@ public class MainPanel extends JPanel {
     chatSplit.setOneTouchExpandable(false);
     chatSplit.setDividerSize(5);
 
-    mainPanel = new JPanelBuilder().border(0).gridBagLayout().build();
-    mainPanel.add(
+    coreMainPanel = new JPanelBuilder().border(0).gridBagLayout().build();
+    coreMainPanel.add(
         gameSelectorPanel,
         new GridBagConstraintsBuilder(0, 0)
             .anchor(GridBagConstraintsAnchor.WEST)
             .fill(GridBagConstraintsFill.VERTICAL)
             .build());
 
-    mainPanel.add(
+    coreMainPanel.add(
         gameSetupPanelScroll,
         new GridBagConstraintsBuilder(1, 0)
             .anchor(GridBagConstraintsAnchor.CENTER)
@@ -96,13 +101,13 @@ public class MainPanel extends JPanel {
     if (chatModel instanceof ChatPanel) {
       addChat((ChatPanel) chatModel);
     } else {
-      add(mainPanel, BorderLayout.CENTER);
+      add(coreMainPanel, BorderLayout.CENTER);
     }
 
     final JButton quitButton =
         new JButtonBuilder()
-            .title("Quit")
-            .toolTip("Close TripleA.")
+            .title(bundle.getString("startup.MainPanel.btn.Quit.Txt"))
+            .toolTip(bundle.getString("startup.MainPanel.btn.Quit.Tltlp"))
             .actionListener(quitAction)
             .build();
     final JPanel buttonsPanel =
@@ -112,13 +117,28 @@ public class MainPanel extends JPanel {
     updatePlayButtonState();
   }
 
+  private static void createUserActionMenu(final JPanel cancelPanel, final List<Action> actions) {
+    // if we need this for something other than network, add a way to set it
+    final JButton button =
+        new JButton(I18nEngineFramework.get().getString("startup.MainPanel.btn.Network"));
+    button.addActionListener(
+        e -> {
+          final JPopupMenu menu = new JPopupMenu();
+          for (final Action a : actions) {
+            menu.add(a);
+          }
+          menu.show(button, 0, button.getHeight());
+        });
+    cancelPanel.add(button);
+  }
+
   private void addChat(final Component chatComponent) {
-    remove(mainPanel);
+    remove(coreMainPanel);
     remove(chatSplit);
     chatPanelHolder.removeAll();
 
     chatPanelHolder.add(chatComponent, BorderLayout.CENTER);
-    chatSplit.setTopComponent(mainPanel);
+    chatSplit.setTopComponent(coreMainPanel);
     chatSplit.setBottomComponent(chatPanelHolder);
     add(chatSplit, BorderLayout.CENTER);
   }
@@ -156,24 +176,10 @@ public class MainPanel extends JPanel {
             this::addChat,
             () -> {
               remove(chatSplit);
-              add(mainPanel);
+              add(coreMainPanel);
             });
 
     revalidate();
-  }
-
-  private static void createUserActionMenu(final JPanel cancelPanel, final List<Action> actions) {
-    // if we need this for something other than network, add a way to set it
-    final JButton button = new JButton("Network...");
-    button.addActionListener(
-        e -> {
-          final JPopupMenu menu = new JPopupMenu();
-          for (final Action a : actions) {
-            menu.add(a);
-          }
-          menu.show(button, 0, button.getHeight());
-        });
-    cancelPanel.add(button);
   }
 
   public void updatePlayButtonState() {

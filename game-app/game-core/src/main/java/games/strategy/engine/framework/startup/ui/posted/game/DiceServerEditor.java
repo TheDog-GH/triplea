@@ -1,6 +1,9 @@
 package games.strategy.engine.framework.startup.ui.posted.game;
 
 import games.strategy.engine.data.properties.GameProperties;
+import games.strategy.engine.framework.HtmlUtils;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.random.IRemoteDiceServer;
 import games.strategy.engine.random.MartiDiceRoller;
 import games.strategy.engine.random.PbemDiceRoller;
@@ -30,47 +33,51 @@ public class DiceServerEditor extends JPanel {
       URI.create("https://prerelease.dice.marti.triplea-game.org");
 
   private static final long serialVersionUID = -451810815037661114L;
-  private final JButton registerButton =
-      new JButtonBuilder("Register")
-          .actionListener(() -> OpenFileUtility.openUrl(UrlConstants.MARTI_REGISTRATION))
-          .toolTip(
-              "<html>Opens email registration page to register with MARTI dice-roller.<br>"
-                  + "Needs to be done once before MARTI dice server can be used.</html>")
-          .build();
-  private final JButton helpButton =
-      new JButtonBuilder("Help")
-          .actionListener(
-              () ->
-                  JOptionPane.showMessageDialog(
-                      this,
-                      new JLabel(
-                          "<html><p style='width: 400px;'>"
-                              + "Enter your your email address in the \"To\" field, and you "
-                              + "opponents in the \"CC\" field, you may enter multiple "
-                              + "addresses each separated by a space. Click the register "
-                              + "button to register your email addresses, this must be done "
-                              + "to receive dice emails."
-                              + "</p></html>"),
-                      "Dice Server Help",
-                      JOptionPane.INFORMATION_MESSAGE))
-          .toolTip("Click this button to show help text")
-          .build();
-  private final JButton testDiceButton = new JButton("Test Server");
+  private final JButton registerButton;
+  private final JButton helpButton;
+  private final JButton testDiceButton;
   private final JTextField toAddress = new JTextField();
   private final JTextField ccAddress = new JTextField();
   private final JTextField gameId = new JTextField();
-  private final JLabel toLabel = new JLabel("To:");
-  private final JLabel ccLabel = new JLabel("Cc:");
+  private final JLabel toLabel;
+  private final JLabel ccLabel;
   private final Runnable readyCallback;
 
   public DiceServerEditor(final Runnable readyCallback) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+    registerButton =
+        new JButtonBuilder(bundle.getString("startup.DiceServerEditor.btn.Register.Txt"))
+            .actionListener(() -> OpenFileUtility.openUrl(UrlConstants.MARTI_REGISTRATION))
+            .toolTip(
+                HtmlUtils.getHtml(bundle.getString("startup.DiceServerEditor.btn.Register.Tltp")))
+            .build();
+    helpButton =
+        new JButtonBuilder(bundle.getString("startup.DiceServerEditor.btn.Help.Txt"))
+            .actionListener(
+                () ->
+                    JOptionPane.showMessageDialog(
+                        this,
+                        new JLabel(
+                            HtmlUtils.getHtml(
+                                bundle.getString("startup.DiceServerEditor.dlg.Help.Txt"))),
+                        bundle.getString("startup.DiceServerEditor.dlg.Help.Ttl"),
+                        JOptionPane.INFORMATION_MESSAGE))
+            .toolTip(bundle.getString("startup.DiceServerEditor.btn.Help.Tltp"))
+            .build();
+
+    testDiceButton = new JButton(bundle.getString("startup.DiceServerEditor.btn.Test.Txt"));
+    toLabel = new JLabel(bundle.getString("startup.DiceServerEditor.lbl.To"));
+    ccLabel = new JLabel(bundle.getString("startup.DiceServerEditor.lbl.Cc"));
+
     this.readyCallback = readyCallback;
     final int bottomSpace = 1;
     final int labelSpace = 2;
 
     final JPanel diceRollerOptions = new JPanel();
     diceRollerOptions.setLayout(new GridBagLayout());
-    diceRollerOptions.setBorder(new TitledBorder("Dice Server Options"));
+    diceRollerOptions.setBorder(
+        new TitledBorder(
+            bundle.getString("startup.DiceServerEditor.DiceRollerOptions.TitledBorder")));
     add(diceRollerOptions);
 
     int row = 0;
@@ -79,7 +86,7 @@ public class DiceServerEditor extends JPanel {
         .getValueOrThrow()
         .equals(ClientSetting.diceRollerUri.getDefaultValue().orElseThrow())) {
       diceRollerOptions.add(
-          new JLabel("Dice Server"),
+          new JLabel(bundle.getString("startup.DiceServerEditor.DiceRollerOptions.lbl.DiceServer")),
           new GridBagConstraints(
               0,
               row,
@@ -167,7 +174,8 @@ public class DiceServerEditor extends JPanel {
             0,
             0));
     row++;
-    final JLabel gameIdLabel = new JLabel("Game Name:");
+    final JLabel gameIdLabel =
+        new JLabel(bundle.getString("startup.DiceServerEditor.DiceRollerOptions.lbl.GameName"));
     diceRollerOptions.add(
         gameIdLabel,
         new GridBagConstraints(
@@ -257,6 +265,7 @@ public class DiceServerEditor extends JPanel {
   }
 
   public boolean areFieldsValid() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final boolean toValid =
         !toAddress.getText().isEmpty() && PlayerEmailValidation.isValid(toAddress.getText());
     final boolean ccValid =
@@ -266,8 +275,8 @@ public class DiceServerEditor extends JPanel {
     testDiceButton.setEnabled(allValid);
     testDiceButton.setToolTipText(
         allValid
-            ? "Send a verified dice roll test email"
-            : "First enter a valid 'to' and 'cc' email address");
+            ? bundle.getString("startup.DiceServerEditor.btn.TestDiceButton.Tltp.Valid")
+            : bundle.getString("startup.DiceServerEditor.btn.TestDiceButton.Tltp.Invalid"));
 
     SwingUtilities.invokeLater(
         () -> {

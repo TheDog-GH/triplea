@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.ui.panels.main.game.selector;
 
 import games.strategy.engine.framework.GameDataFileUtils;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.triplea.settings.ClientSetting;
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -27,7 +28,9 @@ public final class GameFileSelector {
    * pop-up.
    */
   public Optional<Path> selectGameFile(final Frame owner) {
-    final FileDialog fileDialog = new FileDialog(owner, "Open Saved Game");
+    final FileDialog fileDialog =
+        new FileDialog(
+            owner, I18nEngineFramework.get().getString("startup.GameFileSelector.FileDialog"));
     fileDialog.setMode(FileDialog.LOAD);
     fileDialog.setDirectory(ClientSetting.saveGamesFolderPath.getValueOrThrow().toString());
     fileDialog.setFilenameFilter((dir, name) -> GameDataFileUtils.isCandidateFileName(name));
