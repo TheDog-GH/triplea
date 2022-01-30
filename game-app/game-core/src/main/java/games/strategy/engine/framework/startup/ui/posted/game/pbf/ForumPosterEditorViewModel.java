@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import games.strategy.engine.data.properties.GameProperties;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.startup.ui.posted.game.HelpTexts;
 import games.strategy.engine.framework.startup.ui.posted.game.pbf.test.post.SwingTestPostProgressDisplayFactory;
 import games.strategy.engine.framework.startup.ui.posted.game.pbf.test.post.TestPostAction;
@@ -40,7 +41,8 @@ class ForumPosterEditorViewModel {
 
   @Setter(onMethod_ = @VisibleForTesting)
   private BiConsumer<String, Integer> viewForumPostAction =
-      (forumName, topicId) -> NodeBbForumPoster.newInstanceByName(forumName, topicId).viewPosted();
+      (forumName, forumTopicId) ->
+          NodeBbForumPoster.newInstanceByName(forumName, forumTopicId).viewPosted();
 
   private String forumSelection;
   @Getter private String topicId = "";
@@ -107,7 +109,9 @@ class ForumPosterEditorViewModel {
             ? Interruptibles.awaitResult(
                     () ->
                         BackgroundTaskRunner.runInBackgroundAndReturn(
-                            "Logging in...", this::renewToken))
+                            I18nEngineFramework.get()
+                                .getString("startup.ForumPosterEditorViewModel.msg.LoggingIn"),
+                            this::renewToken))
                 .result
             : Optional.of(renewToken());
 
@@ -152,6 +156,14 @@ class ForumPosterEditorViewModel {
     readyCallback.run();
   }
 
+  public synchronized String getForumSelection() {
+    Preconditions.checkNotNull(
+        forumSelection,
+        I18nEngineFramework.get()
+            .getString("startup.ForumPosterEditorViewModel.err.ForumSelectionIsNull"));
+    return forumSelection;
+  }
+
   synchronized void setForumSelection(final String forumSelection) {
     // if forumSelect is null or blank, default it to first forum selection option
     this.forumSelection =
@@ -160,9 +172,8 @@ class ForumPosterEditorViewModel {
             .orElse(getForumSelectionOptions().iterator().next());
     Postconditions.assertState(
         this.forumSelection != null && !this.forumSelection.isBlank(),
-        "Forum selection is driven by a drop-down to ensure user can never set it to null, "
-            + "if setting to null from a game properties, we default to the first available "
-            + "selection entry, forum selection should never be null or empty.");
+        I18nEngineFramework.get()
+            .getString("startup.ForumPosterEditorViewModel.msg.ForumSelection"));
     forumUsername =
         this.forumSelection.equals(NodeBbForumPoster.TRIPLEA_FORUM_DISPLAY_NAME)
             ? ClientSetting.tripleaForumUsername.getValue().map(String::valueOf).orElse("")
@@ -179,17 +190,12 @@ class ForumPosterEditorViewModel {
     return forumTokenExists ? Strings.repeat("*", DUMMY_PASSWORD_LENGTH) : "";
   }
 
-  public String getForumSelection() {
-    Preconditions.checkNotNull(forumSelection, "Forum selection should never be null");
-    return forumSelection;
-  }
-
-  synchronized void setTopicId(final String topicId) {
-    if (this.topicId.equals(topicId)) {
+  synchronized void setTopicId(final String newTopicId) {
+    if (this.topicId.equals(newTopicId)) {
       return;
     }
 
-    this.topicId = topicId;
+    this.topicId = newTopicId;
     readyCallback.run();
   }
 

@@ -1,5 +1,7 @@
 package games.strategy.engine.framework.startup.ui.posted.game.pbf;
 
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.startup.ui.posted.game.HelpTexts;
 import games.strategy.triplea.settings.ClientSetting;
 import java.awt.GridBagConstraints;
@@ -25,44 +27,68 @@ class ForumPosterEditor extends JPanel implements ViewModelListener<ForumPosterE
   private static final long serialVersionUID = -6069315084412575053L;
 
   private final ForumPosterEditorViewModel viewModel;
-  private final JButton viewPosts = new JButton("View Forum");
-  private final JButton testForum = new JButton("Test Post");
+  private final JButton viewPosts;
+  private final JButton testForum;
   private final JLabel helpMessage = new JLabel();
-  private final JButton helpButton =
-      new JButtonBuilder("Help")
-          .actionListener(
-              () ->
-                  JOptionPane.showMessageDialog(
-                      this, helpMessage, "Play By Forum Help", JOptionPane.INFORMATION_MESSAGE))
-          .toolTip("Click this button to show help text")
-          .build();
+  private final JButton helpButton;
   private final JTextField topicIdField = new JTextField();
-  private final JLabel usernameLabel = new JLabel("Forum Username");
+  private final JLabel usernameLabel;
   private final JTextField usernameField = new JTextField();
-  private final JLabel passwordLabel = new JLabel("Forum Password");
+  private final JLabel passwordLabel;
   private final JPasswordField passwordField = new JPasswordField();
-  private final JLabel otpLabel = new JLabel("2FA OTP-Code (optional)");
+  private final JLabel otpLabel;
   private final JTextField otpField = new JTextField();
-  private final JLabel topicIdLabel = new JLabel("Topic Id:");
-  private final JLabel forumLabel = new JLabel("Forums:");
-  private final JCheckBox attachSaveGameToSummary = new JCheckBox("Attach save game to summary");
-  private final JCheckBox alsoPostAfterCombatMove = new JCheckBox("Also Post After Combat Move");
+  private final JLabel topicIdLabel;
+  private final JLabel forumLabel;
+  private final JCheckBox attachSaveGameToSummary;
+  private final JCheckBox alsoPostAfterCombatMove;
   private final JComboBox<String> forums = new JComboBox<>();
-  private final JCheckBox rememberPassword =
-      new JCheckBoxBuilder("Remember Password").bind(ClientSetting.rememberForumPassword).build();
-  private final JButton rememberPasswordHelpButton =
-      new JButtonBuilder("Help")
-          .actionListener(
-              button ->
-                  JOptionPane.showMessageDialog(
-                      button,
-                      HelpTexts.rememberPlayByForumPassword(),
-                      "Remember Password",
-                      JOptionPane.INFORMATION_MESSAGE))
-          .build();
+  private final JCheckBox rememberPassword;
+  private final JButton rememberPasswordHelpButton;
 
   ForumPosterEditor(final ForumPosterEditorViewModel viewModel) {
     super(new GridBagLayout());
+
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+    viewPosts = new JButton(bundle.getString("startup.ForumPosterEditor.btn.ViewForum.Txt"));
+    testForum = new JButton(bundle.getString("startup.ForumPosterEditor.btn.TestForum.Txt"));
+    helpButton =
+        new JButtonBuilder(bundle.getString("Button.Help.Lbl"))
+            .actionListener(
+                () ->
+                    JOptionPane.showMessageDialog(
+                        this,
+                        helpMessage,
+                        bundle.getString("startup.ForumPosterEditor.dlg.Help.Ttl"),
+                        JOptionPane.INFORMATION_MESSAGE))
+            .toolTip(bundle.getString("Button.Help.Tltp"))
+            .build();
+    usernameLabel = new JLabel(bundle.getString("startup.ForumPosterEditor.lbl.ForumUsername.Txt"));
+    passwordLabel = new JLabel(bundle.getString("startup.ForumPosterEditor.lbl.ForumPassword.Txt"));
+    otpLabel = new JLabel(bundle.getString("startup.ForumPosterEditor.lbl.OtpCode.Txt"));
+    topicIdLabel = new JLabel(bundle.getString("startup.ForumPosterEditor.lbl.TopicId.Txt"));
+    forumLabel = new JLabel(bundle.getString("startup.ForumPosterEditor.lbl.Forum.Txt"));
+    attachSaveGameToSummary =
+        new JCheckBox(
+            bundle.getString("startup.ForumPosterEditor.chkbx.AttachSaveGameSummary.Txt"));
+    alsoPostAfterCombatMove =
+        new JCheckBox(
+            bundle.getString("startup.ForumPosterEditor.chkbx.AlsoPostAfterCombatMove.Txt"));
+    rememberPassword =
+        new JCheckBoxBuilder(bundle.getString("Checkbox.RememberPassword.Lbl"))
+            .bind(ClientSetting.rememberForumPassword)
+            .build();
+    rememberPasswordHelpButton =
+        new JButtonBuilder(bundle.getString("Button.Help.Lbl"))
+            .actionListener(
+                button ->
+                    JOptionPane.showMessageDialog(
+                        button,
+                        HelpTexts.rememberPlayByForumPassword(),
+                        bundle.getString("startup.ForumPosterEditor.dlg.RememberPasswordHelp.Ttl"),
+                        JOptionPane.INFORMATION_MESSAGE))
+            .build();
+
     this.viewModel = viewModel;
     viewModel.setView(this);
     // If password is already stored we already remember

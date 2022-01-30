@@ -1,5 +1,7 @@
 package games.strategy.engine.framework.startup.ui.posted.game.pbf.test.post;
 
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import java.util.function.Supplier;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -9,8 +11,11 @@ public class SwingTestPostProgressDisplayFactory implements Supplier<TestPostPro
 
   @Override
   public TestPostProgressDisplay get() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     final ProgressWindow progressWindow =
-        new ProgressWindow(null, "Testing... This may take a while");
+        new ProgressWindow(
+            null,
+            bundle.getString("startup.SwingTestPostProgressDisplayFactory.ProgressWindow.Ttl"));
 
     progressWindow.setVisible(true);
 
@@ -20,7 +25,11 @@ public class SwingTestPostProgressDisplayFactory implements Supplier<TestPostPro
         SwingUtilities.invokeLater(
             () ->
                 JOptionPane.showMessageDialog(
-                    null, message, "Test Turn Summary Post", JOptionPane.INFORMATION_MESSAGE));
+                    null,
+                    message,
+                    bundle.getString(
+                        "startup.SwingTestPostProgressDisplayFactory.dlg.TestPostSuccess"),
+                    JOptionPane.INFORMATION_MESSAGE));
       }
 
       @Override
@@ -30,7 +39,8 @@ public class SwingTestPostProgressDisplayFactory implements Supplier<TestPostPro
                 JOptionPane.showMessageDialog(
                     null,
                     throwable.getMessage(),
-                    "Test Turn Summary Post",
+                    bundle.getString(
+                        "startup.SwingTestPostProgressDisplayFactory.dlg.TestPostFail"),
                     JOptionPane.WARNING_MESSAGE));
       }
 

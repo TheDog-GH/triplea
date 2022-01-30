@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.ui.posted.game.pbf.test.post;
 
 import com.google.common.base.Preconditions;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.posted.game.pbf.NodeBbForumPoster;
 import games.strategy.engine.posted.game.pbf.NodeBbForumPoster.SaveGameParameter;
 import java.awt.Graphics;
@@ -71,7 +72,9 @@ public class TestPostAction implements BiConsumer<String, Integer> {
           } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
           } catch (final ExecutionException e) {
-            log.error("Error while retrieving post", e);
+            log.error(
+                I18nEngineFramework.get().getString("startup.TestPostAction.err.RetrievingPost"),
+                e);
           }
         });
   }

@@ -4,6 +4,7 @@ import static games.strategy.engine.framework.CliProperties.LOBBY_GAME_COMMENTS;
 import static games.strategy.engine.framework.CliProperties.SERVER_PASSWORD;
 
 import com.google.common.base.Strings;
+import games.strategy.engine.framework.I18nEngineFramework;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
@@ -25,7 +26,10 @@ public final class SystemPropertyReader {
               try {
                 return InetAddress.getByName(customHost);
               } catch (final UnknownHostException e) {
-                throw new IllegalArgumentException("Invalid host address: " + customHost);
+                throw new IllegalArgumentException(
+                    I18nEngineFramework.get()
+                        .getString(
+                            "startup.SystemPropertyReader.err.InvalidHostAddress", customHost));
               }
             });
   }
