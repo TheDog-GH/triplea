@@ -1,6 +1,8 @@
 package games.strategy.engine.framework.startup.ui.posted.game.pbem;
 
 import games.strategy.engine.ClientFileSystemHelper;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.posted.game.pbem.IEmailSender;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,12 +24,15 @@ public class SendTestEmailAction {
 
   private void sendWithProgressWindow(final String to) {
     final ProgressWindow progressWindow =
-        new ProgressWindow(JOptionPane.getFrameForComponent(null), "Sending test email...");
+        new ProgressWindow(
+            JOptionPane.getFrameForComponent(null),
+            I18nEngineFramework.get().getString("startup.SendTestEmailAction.ProgressWindow.Ttl"));
     progressWindow.setVisible(true);
     ThreadRunner.runInNewThread(
         () -> {
+          final I18nResourceBundle bundle = I18nEngineFramework.get();
           // initialize variables to error state, override if successful
-          String message = "An unknown occurred, report this as a bug on the TripleA dev forum";
+          String message = bundle.getString("startup.SendTestEmailAction.str.UnknownError");
           int messageType = JOptionPane.ERROR_MESSAGE;
           try {
             final Path dummy =
@@ -40,12 +45,13 @@ public class SendTestEmailAction {
 
             IEmailSender.newInstance("", to).sendEmail("TripleA Test", html, dummy, "dummy.txt");
             // email was sent, or an exception would have been thrown
-            message = "Email sent, it should arrive shortly, otherwise check your spam folder";
+            message = bundle.getString("startup.SendTestEmailAction.str.EmailSent");
             messageType = JOptionPane.INFORMATION_MESSAGE;
           } catch (final IOException ioe) {
             message =
-                "Unable to send email, check SMTP server credentials: "
-                    + StringUtils.truncate(ioe.getMessage(), 200);
+                bundle.getString(
+                    "startup.SendTestEmailAction.str.UnableToSendEmail",
+                    StringUtils.truncate(ioe.getMessage(), 200));
             log.error(message, ioe);
           } finally {
             // now that we have a result, marshall it back unto the swing thread
@@ -54,7 +60,11 @@ public class SendTestEmailAction {
             SwingUtilities.invokeLater(
                 () ->
                     JOptionPane.showMessageDialog(
-                        null, finalMessage, "Email Test", finalMessageType));
+                        null,
+                        finalMessage,
+                        I18nEngineFramework.get()
+                            .getString("startup.SendTestEmailAction.dlg.FinalMessage.Ttl"),
+                        finalMessageType));
             progressWindow.setVisible(false);
           }
         });

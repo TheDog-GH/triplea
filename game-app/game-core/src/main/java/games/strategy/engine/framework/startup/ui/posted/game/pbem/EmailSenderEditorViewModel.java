@@ -3,6 +3,7 @@ package games.strategy.engine.framework.startup.ui.posted.game.pbem;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import games.strategy.engine.data.properties.GameProperties;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.startup.ui.posted.game.HelpTexts;
 import games.strategy.engine.posted.game.pbem.IEmailSender;
 import games.strategy.triplea.settings.ClientSetting;
@@ -16,8 +17,10 @@ import org.triplea.java.StringUtils;
 import org.triplea.java.ViewModelListener;
 
 class EmailSenderEditorViewModel {
-  static final String PROVIDER_DISABLED = "Disabled";
-  static final String GENERIC_SMTP = "Generic SMTP";
+  static final String PROVIDER_DISABLED =
+      I18nEngineFramework.get().getString("startup.EmailSenderEditorViewModel.str.Disabled");
+  static final String GENERIC_SMTP =
+      I18nEngineFramework.get().getString("startup.EmailSenderEditorViewModel.str.GenericSmtp");
 
   private final ViewModelListener<EmailSenderEditorViewModel> view;
 

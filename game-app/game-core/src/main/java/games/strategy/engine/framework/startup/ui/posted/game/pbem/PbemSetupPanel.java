@@ -2,6 +2,7 @@ package games.strategy.engine.framework.startup.ui.posted.game.pbem;
 
 import com.google.common.base.Preconditions;
 import games.strategy.engine.data.GameState;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.message.PlayerListing;
 import games.strategy.engine.framework.startup.launcher.ILauncher;
 import games.strategy.engine.framework.startup.launcher.LocalLauncher;
@@ -50,7 +51,9 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
   private final EmailSenderEditor emailSenderEditor;
   private final List<PlayerSelectorRow> playerTypes = new ArrayList<>();
   private final JPanel localPlayerPanel = new JPanel();
-  private final JButton localPlayerSelection = new JButton("Select Local Players and AI's");
+  private final JButton localPlayerSelection =
+      new JButton(
+          I18nEngineFramework.get().getString("startup.PbemSetupPanel.btn.LocalPlayersAndAis.Lbl"));
 
   /**
    * Creates a new instance.
@@ -86,7 +89,8 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
             JOptionPane.showMessageDialog(
                 PbemSetupPanel.this,
                 scrollPane,
-                "Select Local Players and AI's",
+                I18nEngineFramework.get()
+                    .getString("startup.PbemSetupPanel.dlg.LocalPlayersAndAis.Ttl"),
                 JOptionPane.PLAIN_MESSAGE));
   }
 
@@ -183,10 +187,7 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
     final GameState data = gameSelectorModel.getGameData();
 
     Preconditions.checkNotNull(
-        data,
-        "Game Data must not be null when starting a game, "
-            + "this error indicates a programming bug that allowed for the start game button to be "
-            + "enabled without first valid game data being loaded. ");
+        data, I18nEngineFramework.get().getString("startup.PbemSetupPanel.err.GameDataIsNull"));
     if (diceServerEditor.areFieldsValid()) {
       diceServerEditor.applyToGameProperties(data.getProperties());
     }
@@ -214,9 +215,7 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
   public Optional<ILauncher> getLauncher() {
     Preconditions.checkNotNull(
         gameSelectorModel.getGameData(),
-        "Game Data must not be null when launching a game, "
-            + "this error indicates a programming bug that allowed for the start game button to be "
-            + "enabled without first valid game data being loaded. ");
+        I18nEngineFramework.get().getString("startup.PbemSetupPanel.err.GameDataIsNull"));
 
     if (emailSenderEditor.isForgetPasswordOnShutdown()) {
       ExitStatus.addExitAction(
@@ -227,10 +226,10 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
     }
 
     final PbemDiceRoller randomSource = new PbemDiceRoller(diceServerEditor.newDiceServer());
-    final Map<String, PlayerTypes.Type> playerTypes = new HashMap<>();
+    final Map<String, PlayerTypes.Type> playerTypeMap = new HashMap<>();
     final Map<String, Boolean> playersEnabled = new HashMap<>();
     for (final PlayerSelectorRow player : this.playerTypes) {
-      playerTypes.put(player.getPlayerName(), player.getPlayerType());
+      playerTypeMap.put(player.getPlayerName(), player.getPlayerType());
       playersEnabled.put(player.getPlayerName(), player.isPlayerEnabled());
     }
     // we don't need the playerToNode list, the
@@ -240,7 +239,7 @@ public class PbemSetupPanel extends SetupPanel implements Observer {
         new PlayerListing(
             null,
             playersEnabled,
-            playerTypes,
+            playerTypeMap,
             gameSelectorModel.getGameName(),
             gameSelectorModel.getGameRound(),
             null,

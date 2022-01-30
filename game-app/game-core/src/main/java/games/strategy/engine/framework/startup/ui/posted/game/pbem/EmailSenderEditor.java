@@ -1,6 +1,8 @@
 package games.strategy.engine.framework.startup.ui.posted.game.pbem;
 
 import games.strategy.engine.data.properties.GameProperties;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.startup.ui.posted.game.HelpTexts;
 import games.strategy.triplea.settings.ClientSetting;
 import javax.swing.JButton;
@@ -32,144 +34,176 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
   private boolean syncToModel;
   private JPanel contents;
 
-  private final JComboBox<String> emailProviderSelectionBox =
-      JComboBoxBuilder.builder()
-          .items(EmailSenderEditorViewModel.getProviderOptions())
-          .selectedItem(viewModel.getSelectedProvider())
-          .itemSelectedAction(
-              provider -> {
-                if (syncToModel) {
-                  viewModel.setSelectedProvider(provider);
-                }
-              })
-          .build();
+  private final JComboBox<String> emailProviderSelectionBox;
 
-  private final JButton helpButton =
-      new JButtonBuilder("Help")
-          .actionListener(
-              () ->
-                  JOptionPane.showMessageDialog(
-                      contents,
-                      new JLabel(viewModel.getEmailHelpText()),
-                      "Play By Email Help",
-                      JOptionPane.INFORMATION_MESSAGE))
-          .toolTip("Click this button to show help text")
-          .build();
+  private final JButton helpButton;
 
-  private final JLabel smtpServerLabel = new JLabel("SMTP Server");
-  private final JTextField smtpServerField =
-      JTextFieldBuilder.builder()
-          .text(viewModel.getSmtpServer())
-          .textListener(
-              server -> {
-                if (syncToModel) {
-                  viewModel.setSmtpServer(server);
-                }
-              })
-          .columns(FIELD_LENGTH)
-          .build();
+  private final JLabel smtpServerLabel;
+  private final JTextField smtpServerField;
 
-  private final JLabel smtpPortLabel = new JLabel("Port");
-  private final JTextField smtpPortField =
-      JTextFieldBuilder.builder()
-          .text(viewModel.getSmtpPort())
-          .textListener(
-              smtpPort -> {
-                if (syncToModel) {
-                  viewModel.setSmtpPort(smtpPort);
-                }
-              })
-          .columns(FIELD_LENGTH)
-          .build();
+  private final JLabel smtpPortLabel;
+  private final JTextField smtpPortField;
 
-  private final JCheckBox useTlsCheckBox =
-      new JCheckBoxBuilder("Use TLS encryption")
-          .selected(viewModel.isUseTls())
-          .actionListener(
-              useTls -> {
-                if (syncToModel) {
-                  viewModel.setUseTls(useTls);
-                }
-              })
-          .build();
+  private final JCheckBox useTlsCheckBox;
 
-  private final JLabel subjectLabel = new JLabel("Subject");
-  private final JTextField subjectField =
-      JTextFieldBuilder.builder()
-          .text(viewModel.getSubject())
-          .textListener(
-              subject -> {
-                if (syncToModel) {
-                  viewModel.setSubject(subject);
-                }
-              })
-          .columns(FIELD_LENGTH)
-          .build();
+  private final JLabel subjectLabel;
+  private final JTextField subjectField;
 
-  private final JLabel toAddressLabel = new JLabel("To:");
-  private final JTextField toAddressField =
-      JTextFieldBuilder.builder()
-          .text(viewModel.getToAddress())
-          .textListener(
-              toAddress -> {
-                if (syncToModel) {
-                  viewModel.setToAddress(toAddress);
-                }
-              })
-          .columns(FIELD_LENGTH)
-          .build();
+  private final JLabel toAddressLabel;
+  private final JTextField toAddressField;
 
-  private final JLabel userNameLabel = new JLabel("Email Username:");
-  private final JTextField userNameField =
-      JTextFieldBuilder.builder()
-          .text(viewModel.getEmailUsername())
-          .textListener(
-              fieldValue -> {
-                if (syncToModel) {
-                  viewModel.setEmailUsername(fieldValue);
-                }
-              })
-          .columns(FIELD_LENGTH)
-          .build();
+  private final JLabel userNameLabel;
+  private final JTextField userNameField;
 
-  private final JLabel passwordLabel = new JLabel("Email Password:");
-  private final JPasswordField passwordField =
-      new JPasswordField(viewModel.getEmailPassword(), FIELD_LENGTH);
+  private final JLabel passwordLabel;
+  private final JPasswordField passwordField;
 
-  private final JCheckBox rememberPassword =
-      new JCheckBoxBuilder("Remember Password")
-          .actionListener(viewModel::setRememberPassword)
-          .bind(ClientSetting.rememberEmailPassword)
-          .build();
-  private final JButton rememberPasswordHelpButton =
-      new JButtonBuilder("Help")
-          .actionListener(
-              button ->
-                  JOptionPane.showMessageDialog(
-                      button,
-                      HelpTexts.rememberPlayByEmailPassword(),
-                      "Remember Password",
-                      JOptionPane.INFORMATION_MESSAGE))
-          .build();
+  private final JCheckBox rememberPassword;
+  private final JButton rememberPasswordHelpButton;
 
-  private final JCheckBox sendEmailAfterCombatMoveCheckBox =
-      new JCheckBoxBuilder("Also Send Email After Combat Move")
-          .selected(viewModel.isSendEmailAfterCombatMove())
-          .actionListener(
-              sendEmailAfterCombatMove -> {
-                if (syncToModel) {
-                  viewModel.setSendEmailAfterCombatMove(sendEmailAfterCombatMove);
-                }
-              })
-          .build();
+  private final JCheckBox sendEmailAfterCombatMoveCheckBox;
 
-  private final JButton testEmailButton =
-      new JButtonBuilder("Send Test Email")
-          .enabled(viewModel.isTestEmailButtonEnabled())
-          .actionListener(viewModel::sendTestEmail)
-          .build();
+  private final JButton testEmailButton;
 
   public EmailSenderEditor(final Runnable readyCallback) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
+    emailProviderSelectionBox =
+        JComboBoxBuilder.builder()
+            .items(EmailSenderEditorViewModel.getProviderOptions())
+            .selectedItem(viewModel.getSelectedProvider())
+            .itemSelectedAction(
+                provider -> {
+                  if (syncToModel) {
+                    viewModel.setSelectedProvider(provider);
+                  }
+                })
+            .build();
+
+    helpButton =
+        new JButtonBuilder(bundle.getString("Button.Help.Lbl"))
+            .actionListener(
+                () ->
+                    JOptionPane.showMessageDialog(
+                        contents,
+                        new JLabel(viewModel.getEmailHelpText()),
+                        bundle.getString("startup.EmailSenderEditor.dlg.Help.Ttl"),
+                        JOptionPane.INFORMATION_MESSAGE))
+            .toolTip(bundle.getString("Button.Help.Tltp"))
+            .build();
+
+    smtpServerLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.SmtpServer"));
+    smtpServerField =
+        JTextFieldBuilder.builder()
+            .text(viewModel.getSmtpServer())
+            .textListener(
+                server -> {
+                  if (syncToModel) {
+                    viewModel.setSmtpServer(server);
+                  }
+                })
+            .columns(FIELD_LENGTH)
+            .build();
+
+    smtpPortLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.Port"));
+    smtpPortField =
+        JTextFieldBuilder.builder()
+            .text(viewModel.getSmtpPort())
+            .textListener(
+                smtpPort -> {
+                  if (syncToModel) {
+                    viewModel.setSmtpPort(smtpPort);
+                  }
+                })
+            .columns(FIELD_LENGTH)
+            .build();
+
+    useTlsCheckBox =
+        new JCheckBoxBuilder(bundle.getString("startup.EmailSenderEditor.chkbx.UseTls.Lbl"))
+            .selected(viewModel.isUseTls())
+            .actionListener(
+                useTls -> {
+                  if (syncToModel) {
+                    viewModel.setUseTls(useTls);
+                  }
+                })
+            .build();
+
+    subjectLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.Subject"));
+    subjectField =
+        JTextFieldBuilder.builder()
+            .text(viewModel.getSubject())
+            .textListener(
+                subject -> {
+                  if (syncToModel) {
+                    viewModel.setSubject(subject);
+                  }
+                })
+            .columns(FIELD_LENGTH)
+            .build();
+
+    toAddressLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.To"));
+    toAddressField =
+        JTextFieldBuilder.builder()
+            .text(viewModel.getToAddress())
+            .textListener(
+                toAddress -> {
+                  if (syncToModel) {
+                    viewModel.setToAddress(toAddress);
+                  }
+                })
+            .columns(FIELD_LENGTH)
+            .build();
+
+    userNameLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.EmailUsername"));
+    userNameField =
+        JTextFieldBuilder.builder()
+            .text(viewModel.getEmailUsername())
+            .textListener(
+                fieldValue -> {
+                  if (syncToModel) {
+                    viewModel.setEmailUsername(fieldValue);
+                  }
+                })
+            .columns(FIELD_LENGTH)
+            .build();
+
+    passwordLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.EmailPassword"));
+    passwordField = new JPasswordField(viewModel.getEmailPassword(), FIELD_LENGTH);
+
+    rememberPassword =
+        new JCheckBoxBuilder(bundle.getString("Checkbox.RememberPassword.Lbl"))
+            .actionListener(viewModel::setRememberPassword)
+            .bind(ClientSetting.rememberEmailPassword)
+            .build();
+    rememberPasswordHelpButton =
+        new JButtonBuilder(bundle.getString("Button.Help.Lbl"))
+            .actionListener(
+                button ->
+                    JOptionPane.showMessageDialog(
+                        button,
+                        HelpTexts.rememberPlayByEmailPassword(),
+                        bundle.getString("startup.EmailSenderEditor.dlg.Help.RememberPassword.Ttl"),
+                        JOptionPane.INFORMATION_MESSAGE))
+            .build();
+
+    sendEmailAfterCombatMoveCheckBox =
+        new JCheckBoxBuilder(
+                bundle.getString("startup.EmailSenderEditor.chkbx.EmailAfterCombat.Lbl"))
+            .selected(viewModel.isSendEmailAfterCombatMove())
+            .actionListener(
+                sendEmailAfterCombatMove -> {
+                  if (syncToModel) {
+                    viewModel.setSendEmailAfterCombatMove(sendEmailAfterCombatMove);
+                  }
+                })
+            .build();
+
+    testEmailButton =
+        new JButtonBuilder(bundle.getString("startup.EmailSenderEditor.btn.SendTestEmail.Lbl"))
+            .enabled(viewModel.isTestEmailButtonEnabled())
+            .actionListener(viewModel::sendTestEmail)
+            .build();
+
     viewModel.setValidatedFieldsChangedListener(readyCallback);
     this.viewModelChanged(viewModel);
 
@@ -179,17 +213,20 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
   }
 
   JPanel build() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     toggleFieldVisibility();
 
     contents =
         new JPanelBuilder()
-            .border(new TitledBorder("Automatically Send Emails"))
+            .border(new TitledBorder(bundle.getString("startup.EmailSenderEditor.Title.Contents")))
             .gridBagLayout()
             .build();
     int row = 0;
 
     row++;
-    contents.add(new JLabel("Email Provider"), new GridBagConstraintsBuilder(0, row).build());
+    contents.add(
+        new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.EmailProvider")),
+        new GridBagConstraintsBuilder(0, row).build());
     contents.add(emailProviderSelectionBox, new GridBagConstraintsBuilder(1, row).build());
     contents.add(helpButton, new GridBagConstraintsBuilder(2, row).build());
 

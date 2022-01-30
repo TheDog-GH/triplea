@@ -62,7 +62,7 @@ public class DiceServerEditor extends JPanel {
                                 bundle.getString("startup.DiceServerEditor.dlg.Help.Txt"))),
                         bundle.getString("startup.DiceServerEditor.dlg.Help.Ttl"),
                         JOptionPane.INFORMATION_MESSAGE))
-            .toolTip(bundle.getString("startup.DiceServerEditor.btn.Help.Tltp"))
+            .toolTip(bundle.getString("Button.Help.Tltp"))
             .build();
 
     testDiceButton = new JButton(bundle.getString("startup.DiceServerEditor.btn.Test.Txt"));
