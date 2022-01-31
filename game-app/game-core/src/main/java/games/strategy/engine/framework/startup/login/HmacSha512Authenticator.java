@@ -3,6 +3,7 @@ package games.strategy.engine.framework.startup.login;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import games.strategy.engine.framework.I18nEngineFramework;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -105,7 +106,11 @@ final class HmacSha512Authenticator {
                   .put(encodeProperty(ResponsePropertyNames.DIGEST, digest(password, salt, nonce)))
                   .build()));
     } catch (final GeneralSecurityException e) {
-      throw new AuthenticationException("security framework failure when creating response", e);
+      throw new AuthenticationException(
+          I18nEngineFramework.get()
+              .getString(
+                  "startup.HmacSha512Authenticator.err.SecurityFrameworkFailedCreatingResponse"),
+          e);
     }
   }
 
@@ -121,7 +126,9 @@ final class HmacSha512Authenticator {
       return Base64.getDecoder().decode(value);
     } catch (final IllegalArgumentException e) {
       throw new AuthenticationException(
-          String.format("malformed value for property '%s'", name), e);
+          I18nEngineFramework.get()
+              .getString("startup.HmacSha512Authenticator.err.MalformedPropertyValue", name),
+          e);
     }
   }
 
@@ -181,10 +188,16 @@ final class HmacSha512Authenticator {
     try {
       final byte[] expectedDigest = digest(password, salt, nonce);
       if (!MessageDigest.isEqual(expectedDigest, actualDigest)) {
-        throw new AuthenticationException("authentication failed");
+        throw new AuthenticationException(
+            I18nEngineFramework.get()
+                .getString("startup.HmacSha512Authenticator.err.AuthenticationFailed"));
       }
     } catch (final GeneralSecurityException e) {
-      throw new AuthenticationException("security framework failure during authentication", e);
+      throw new AuthenticationException(
+          I18nEngineFramework.get()
+              .getString(
+                  "startup.HmacSha512Authenticator.err.SecurityFrameworkFailedAuthentication"),
+          e);
     }
   }
 
@@ -193,7 +206,9 @@ final class HmacSha512Authenticator {
       throws AuthenticationException {
     final byte[] value = decodeOptionalProperty(properties, name);
     if (value == null) {
-      throw new AuthenticationException(String.format("missing property '%s'", name));
+      throw new AuthenticationException(
+          I18nEngineFramework.get()
+              .getString("startup.HmacSha512Authenticator.err.MissingProperty", name));
     }
 
     return value;

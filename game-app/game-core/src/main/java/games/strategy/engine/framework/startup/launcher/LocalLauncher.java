@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.launcher;
 
 import games.strategy.engine.data.GameData;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.ServerGame;
 import games.strategy.engine.framework.message.PlayerListing;
 import games.strategy.engine.framework.startup.launcher.local.PlayerCountrySelection;
@@ -82,7 +83,7 @@ public class LocalLauncher implements ILauncher {
       // The throwing method of MapNotFoundException notifies and prompts user to download the map.
       return Optional.empty();
     } catch (final Exception ex) {
-      log.error("Failed to start game", ex);
+      log.error(I18nEngineFramework.get().getString("startup.LocalLauncher.err.StartGame"), ex);
       return Optional.empty();
     }
   }

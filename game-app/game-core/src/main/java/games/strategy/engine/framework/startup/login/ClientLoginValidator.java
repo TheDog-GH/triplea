@@ -2,6 +2,7 @@ package games.strategy.engine.framework.startup.login;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.net.ILoginValidator;
 import games.strategy.net.IServerMessenger;
 import java.net.InetSocketAddress;
@@ -24,18 +25,57 @@ import org.triplea.util.Version;
  */
 @RequiredArgsConstructor
 public final class ClientLoginValidator implements ILoginValidator {
-  static final String PASSWORD_REQUIRED_PROPERTY = "Password Required";
+  static final String PASSWORD_REQUIRED_PROPERTY =
+      I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.PasswordRequired");
 
   private final Version engineVersion;
   @Setter private IServerMessenger serverMessenger;
   @Nullable private String password;
 
-  @VisibleForTesting
-  interface ErrorMessages {
-    String NO_ERROR = null;
-    String INVALID_PASSWORD = "Invalid password";
-    String UNABLE_TO_OBTAIN_MAC = "Unable to obtain mac address";
-    String YOU_HAVE_BEEN_BANNED = "The host has banned you from this game";
+  @Override
+  @Nullable
+  public String verifyConnection(
+      final Map<String, String> propertiesSentToClient,
+      final Map<String, String> propertiesReadFromClient,
+      final String clientName,
+      final String hashedMac,
+      final InetSocketAddress remoteAddress) {
+    final String versionString = propertiesReadFromClient.get(ClientLogin.ENGINE_VERSION_PROPERTY);
+    if (versionString == null || versionString.length() > 20 || versionString.isBlank()) {
+      return I18nEngineFramework.get()
+          .getString("startup.ClientLoginValidator.err.InvalidVersion", versionString);
+    }
+
+    // check for version
+    final Version clientVersion = new Version(versionString);
+    if (engineVersion.getMajor() != clientVersion.getMajor()) {
+      return String.format(
+          I18nEngineFramework.get()
+              .getString("startup.ClientLoginValidator.err.VersionIncompatible"),
+          clientVersion,
+          Injections.getInstance().getEngineVersion());
+    }
+
+    final String remoteIp = remoteAddress.getAddress().getHostAddress();
+    if (serverMessenger.isPlayerBanned(remoteIp, hashedMac)) {
+      return ErrorMessages.YOU_HAVE_BEEN_BANNED;
+    }
+
+    if (hashedMac == null) {
+      return ErrorMessages.UNABLE_TO_OBTAIN_MAC;
+    }
+
+    if (Boolean.TRUE.toString().equals(propertiesSentToClient.get(PASSWORD_REQUIRED_PROPERTY))) {
+      final String errorMessage = authenticate(propertiesSentToClient, propertiesReadFromClient);
+      if (!Objects.equals(errorMessage, ErrorMessages.NO_ERROR)) {
+        // sleep on average 2 seconds
+        // try to prevent flooding to guess the password
+        Interruptibles.sleep((long) (4_000 * Math.random()));
+        return errorMessage;
+      }
+    }
+
+    return ErrorMessages.NO_ERROR;
   }
 
   /** Set the password required for the game. If {@code null} or empty, no password is required. */
@@ -60,47 +100,16 @@ public final class ClientLoginValidator implements ILoginValidator {
     return challenge;
   }
 
-  @Override
-  @Nullable
-  public String verifyConnection(
-      final Map<String, String> propertiesSentToClient,
-      final Map<String, String> propertiesReadFromClient,
-      final String clientName,
-      final String hashedMac,
-      final InetSocketAddress remoteAddress) {
-    final String versionString = propertiesReadFromClient.get(ClientLogin.ENGINE_VERSION_PROPERTY);
-    if (versionString == null || versionString.length() > 20 || versionString.isBlank()) {
-      return "Invalid version " + versionString;
-    }
-
-    // check for version
-    final Version clientVersion = new Version(versionString);
-    if (engineVersion.getMajor() != clientVersion.getMajor()) {
-      return String.format(
-          "Client is using %s but the server requires a version compatible with version %s",
-          clientVersion, Injections.getInstance().getEngineVersion());
-    }
-
-    final String remoteIp = remoteAddress.getAddress().getHostAddress();
-    if (serverMessenger.isPlayerBanned(remoteIp, hashedMac)) {
-      return ErrorMessages.YOU_HAVE_BEEN_BANNED;
-    }
-
-    if (hashedMac == null) {
-      return ErrorMessages.UNABLE_TO_OBTAIN_MAC;
-    }
-
-    if (Boolean.TRUE.toString().equals(propertiesSentToClient.get(PASSWORD_REQUIRED_PROPERTY))) {
-      final String errorMessage = authenticate(propertiesSentToClient, propertiesReadFromClient);
-      if (!Objects.equals(errorMessage, ErrorMessages.NO_ERROR)) {
-        // sleep on average 2 seconds
-        // try to prevent flooding to guess the password
-        Interruptibles.sleep((long) (4_000 * Math.random()));
-        return errorMessage;
-      }
-    }
-
-    return ErrorMessages.NO_ERROR;
+  @VisibleForTesting
+  interface ErrorMessages {
+    String NO_ERROR = null;
+    String INVALID_PASSWORD =
+        I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.InvalidPassword");
+    String UNABLE_TO_OBTAIN_MAC =
+        I18nEngineFramework.get()
+            .getString("startup.ClientLoginValidator.str.UnableToObtainMacAddress");
+    String YOU_HAVE_BEEN_BANNED =
+        I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.HostHasBannedYou");
   }
 
   @VisibleForTesting

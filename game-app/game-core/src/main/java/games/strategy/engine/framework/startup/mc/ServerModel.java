@@ -23,6 +23,7 @@ import games.strategy.engine.framework.GameObjectStreamFactory;
 import games.strategy.engine.framework.GameRunner;
 import games.strategy.engine.framework.GameState;
 import games.strategy.engine.framework.HeadlessAutoSaveType;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.engine.framework.message.PlayerListing;
 import games.strategy.engine.framework.startup.LobbyWatcherThread;
 import games.strategy.engine.framework.startup.WatcherThreadMessaging;
@@ -45,6 +46,7 @@ import java.io.InputStream;
 import java.net.BindException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -254,7 +256,11 @@ public class ServerModel extends Observable implements IConnectionChangeListener
                   }
                 });
           } catch (final Exception e) {
-            log.error("Failed to load save game: " + fileName, e);
+            log.error(
+                MessageFormat.format(
+                    I18nEngineFramework.get().getString("startup.ServerModel.err.SaveGame"),
+                    fileName),
+                e);
           }
         }
 
@@ -270,7 +276,8 @@ public class ServerModel extends Observable implements IConnectionChangeListener
           try {
             headless.loadGameOptions(bytes);
           } catch (final Exception e) {
-            log.error("Failed to load game options", e);
+            log.error(
+                I18nEngineFramework.get().getString("startup.ServerModel.err.LoadGameOptions"), e);
           }
         }
       };
@@ -379,22 +386,33 @@ public class ServerModel extends Observable implements IConnectionChangeListener
                         return null;
                       }
                       final String name = options.getName();
-                      log.debug("Server playing as:" + name);
+                      log.debug(
+                          I18nEngineFramework.get()
+                              .getString("startup.ServerModel.debug.ServerPlayingAs", name));
                       ClientSetting.playerName.setValue(name);
                       ClientSetting.flush();
                       final int port = options.getPort();
                       if (port >= 65536 || port == 0) {
                         if (HeadlessGameServer.headless()) {
-                          throw new IllegalStateException("Invalid Port: " + port);
+                          throw new IllegalStateException(
+                              I18nEngineFramework.get()
+                                  .getString("startup.ServerModel.err.InvalidPort", port));
                         }
                         JOptionPane.showMessageDialog(
-                            ui, "Invalid Port: " + port, "Error", JOptionPane.ERROR_MESSAGE);
+                            ui,
+                            I18nEngineFramework.get()
+                                .getString("startup.ServerModel.dlg.InvalidPort.Msg", port),
+                            I18nEngineFramework.get()
+                                .getString("startup.ServerModel.dlg.InvalidPort.Ttl"),
+                            JOptionPane.ERROR_MESSAGE);
                         return null;
                       }
                       return options;
                     }));
     if (!optionsResult.completed) {
-      throw new IllegalArgumentException("Error while gathering connection details");
+      throw new IllegalArgumentException(
+          I18nEngineFramework.get()
+              .getString("startup.ServerModel.err.GatheringConnectionDetails"));
     }
     if (optionsResult.result.isEmpty()) {
       cancel();
@@ -486,13 +504,12 @@ public class ServerModel extends Observable implements IConnectionChangeListener
       serverSetupModel.onServerMessengerCreated(this, gameHostingResponse);
     } catch (final BindException e) {
       log.warn(
-          "Could not open network port, please close any other TripleA games you are\n"
-              + "hosting or choose a different network port. If that is not the problem\n"
-              + "then check your firewall rules.",
+          I18nEngineFramework.get().getString("startup.ServerModel.warn.CouldNotOpenNetworkPort"),
           e);
       cancel();
     } catch (final IOException e) {
-      log.error("Unable to create server socket.", e);
+      log.error(
+          I18nEngineFramework.get().getString("startup.ServerModel.err.CreateServerSocket"), e);
       cancel();
     }
   }
@@ -567,7 +584,12 @@ public class ServerModel extends Observable implements IConnectionChangeListener
               final IClientChannel channel =
                   (IClientChannel) messenger.getChannelBroadcaster(IClientChannel.CHANNEL_NAME);
               AsyncRunner.runAsync(() -> channel.playerListingChanged(getPlayerListingInternal()))
-                  .exceptionally(e -> log.warn("Network communication error", e));
+                  .exceptionally(
+                      e ->
+                          log.warn(
+                              I18nEngineFramework.get()
+                                  .getString("startup.ClientModel.warn.NetworkCommunicationError"),
+                              e));
             });
   }
 

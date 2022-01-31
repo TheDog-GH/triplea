@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.mc;
 
 import games.strategy.engine.chat.ChatMessageListener;
+import games.strategy.engine.framework.I18nEngineFramework;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import lombok.Builder;
@@ -36,7 +37,11 @@ class ServerChatUpload implements ChatMessageListener {
             e ->
                 // Handle this as an info level so we do not disturb the user with an error pop-up,
                 // we want this to be a silent failure.
-                log.info("Error sending chat message to lobby: " + e.getMessage()));
+                log.info(
+                    I18nEngineFramework.get()
+                        .getString(
+                            "startup.ServerChatUpload.info.ErrorSendChatMessageToLobby",
+                            e.getMessage())));
   }
 
   private ChatUploadParams buildUploadParams(

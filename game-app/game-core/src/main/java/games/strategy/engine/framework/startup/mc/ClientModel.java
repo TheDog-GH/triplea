@@ -15,6 +15,8 @@ import games.strategy.engine.framework.GameObjectStreamFactory;
 import games.strategy.engine.framework.GameRunner;
 import games.strategy.engine.framework.GameState;
 import games.strategy.engine.framework.HeadlessAutoSaveType;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.message.PlayerListing;
 import games.strategy.engine.framework.network.ui.ChangeGameOptionsClientAction;
 import games.strategy.engine.framework.network.ui.ChangeGameToSaveGameClientAction;
@@ -43,6 +45,7 @@ import games.strategy.triplea.settings.ClientSetting;
 import java.awt.Component;
 import java.awt.Frame;
 import java.io.ByteArrayInputStream;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,7 +117,10 @@ public class ClientModel implements IMessengerErrorListener {
           SwingUtilities.invokeLater(
               () -> {
                 typePanelModel.showSelectType();
-                EventThreadJOptionPane.showMessageDialog(ui, "Could not join game: " + reason);
+                EventThreadJOptionPane.showMessageDialog(
+                    ui,
+                    I18nEngineFramework.get()
+                        .getString("startup.ClientModel.dlg.CouldNotJoin.Msg", reason));
               });
         }
       };
@@ -157,17 +163,15 @@ public class ClientModel implements IMessengerErrorListener {
     final Interruptibles.Result<WaitWindow> window =
         Interruptibles.awaitResult(() -> SwingAction.invokeAndWaitResult(WaitWindow::new));
     if (!window.completed) {
-      throw new IllegalStateException("Error while creating WaitWindow");
+      throw new IllegalStateException(
+          I18nEngineFramework.get().getString("startup.ClientModel.err.WhileCreatingWaitWindow"));
     }
     gameLoadingWindow =
         window.result.orElseThrow(
-            () -> new IllegalStateException("Constructor did not return instance"));
-  }
-
-  public void setRemoteModelListener(@Nonnull final IRemoteModelListener listener) {
-    this.listener = Preconditions.checkNotNull(listener);
-    AsyncRunner.runAsync(() -> internalPlayerListingChanged(getServerStartup().getPlayerListing()))
-        .exceptionally(e -> log.warn("Network communication error", e));
+            () ->
+                new IllegalStateException(
+                    I18nEngineFramework.get()
+                        .getString("startup.ClientModel.err.ConstructorNoInstance")));
   }
 
   private static ClientProps getProps(final Component ui) {
@@ -203,9 +207,21 @@ public class ClientModel implements IMessengerErrorListener {
                           .build();
                     }));
     if (!result.completed) {
-      throw new IllegalStateException("Error during component creation of ClientOptions.");
+      throw new IllegalStateException(
+          I18nEngineFramework.get().getString("startup.ClientModel.err.DuringComponentCreation"));
     }
     return result.result.orElse(null);
+  }
+
+  public void setRemoteModelListener(@Nonnull final IRemoteModelListener listener) {
+    this.listener = Preconditions.checkNotNull(listener);
+    AsyncRunner.runAsync(() -> internalPlayerListingChanged(getServerStartup().getPlayerListing()))
+        .exceptionally(
+            e ->
+                log.warn(
+                    I18nEngineFramework.get()
+                        .getString("startup.ClientModel.warn.NetworkCommunicationError"),
+                    e));
   }
 
   /**
@@ -214,6 +230,7 @@ public class ClientModel implements IMessengerErrorListener {
    * connected.
    */
   public boolean createClientMessenger(final Component ui) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     this.ui = JOptionPane.getFrameForComponent(ui);
     gameDataOnStartup = gameSelectorModel.getGameData();
     gameSelectorModel.setCanSelect(false);
@@ -226,7 +243,10 @@ public class ClientModel implements IMessengerErrorListener {
     final int port = props.getPort();
     if (port >= 65536 || port <= 0) {
       EventThreadJOptionPane.showMessageDialog(
-          this.ui, "Invalid Port: " + port, "Error", JOptionPane.ERROR_MESSAGE);
+          this.ui,
+          MessageFormat.format(bundle.getString("startup.ClientModel.dlg.InvalidPort.Msg"), port),
+          bundle.getString("startup.ClientModel.dlg.InvalidPort.Ttl"),
+          JOptionPane.ERROR_MESSAGE);
       return false;
     }
     try {
@@ -241,21 +261,14 @@ public class ClientModel implements IMessengerErrorListener {
       EventThreadJOptionPane.showMessageDialog(this.ui, e.getMessage());
       return false;
     } catch (final Exception ioe) {
-      log.info("Error connecting to host", ioe);
+      log.info(bundle.getString("startup.ClientModel.info.ErrorConnectingToHost"), ioe);
       SwingComponents.showError(
           ui,
-          "Error Connecting to Host",
-          "Error: "
-              + ioe.getMessage()
-              + "\n\nCheck:\n"
-              + "- The host is running\n"
-              + "- You have the right port and IP address\n"
-              + "- The host should use and can check their public IP address by "
-              + "visiting 'whatismyip.com'\n"
-              + "- The host can check that they are able to connect to their own game\n"
-              + "using their public IP\n"
-              + "Additional help can be found on the user-guide: "
-              + UrlConstants.USER_GUIDE);
+          bundle.getString("startup.ClientModel.err.ConnectingToHost.Ttl"),
+          bundle.getString(
+              "startup.ClientModel.err.ConnectingToHost.Msg",
+              ioe.getMessage(),
+              UrlConstants.USER_GUIDE));
       return false;
     }
     messenger.addErrorListener(this);
@@ -268,12 +281,7 @@ public class ClientModel implements IMessengerErrorListener {
       gameSelectorModel.setClientModelForHostBots(this);
       chatPanel
           .getChatMessagePanel()
-          .addServerMessage(
-              "Welcome to an automated dedicated host service (a host bot). "
-                  + "\nIf anyone disconnects, the autosave will be reloaded (a save might "
-                  + "be loaded right now). "
-                  + "\nYou can get the current save, or you can load a save (only saves that "
-                  + "it has the map for).");
+          .addServerMessage(bundle.getString("startup.ClientModel.msg.ServerMessage"));
     }
     messengers.registerRemote(
         observerWaitingToJoin, ServerModel.getObserverWaitingToStartName(messenger.getLocalNode()));
@@ -361,7 +369,8 @@ public class ClientModel implements IMessengerErrorListener {
                 data.getGameLoader()
                     .startGame(game, playerSet, launchAction, getChatPanel().getChat());
               } catch (final Exception e) {
-                log.error("Failed to start Game", e);
+                log.error(
+                    I18nEngineFramework.get().getString("startup.ClientModel.err.StartGame"), e);
                 game.shutDown();
                 messenger.shutDown();
                 gameLoadingWindow.doneWait();
@@ -378,25 +387,32 @@ public class ClientModel implements IMessengerErrorListener {
         });
   }
 
+
+
   public void takePlayer(final String playerName) {
     AsyncRunner.runAsync(() -> getServerStartup().takePlayer(messenger.getLocalNode(), playerName))
-        .exceptionally(e -> log.warn("Network communication error", e));
+        .exceptionally(this::logNetworkCommunicationError);
+  }
+
+  private void logNetworkCommunicationError(final Throwable e) {
+    log.warn(
+        I18nEngineFramework.get().getString("startup.ClientModel.err.NetworkCommunication"), e);
   }
 
   public void releasePlayer(final String playerName) {
     AsyncRunner.runAsync(
             () -> getServerStartup().releasePlayer(messenger.getLocalNode(), playerName))
-        .exceptionally(e -> log.warn("Network communication error", e));
+        .exceptionally(this::logNetworkCommunicationError);
   }
 
   public void disablePlayer(final String playerName) {
     AsyncRunner.runAsync(() -> getServerStartup().disablePlayer(playerName))
-        .exceptionally(e -> log.warn("Network communication error", e));
+        .exceptionally(this::logNetworkCommunicationError);
   }
 
   public void enablePlayer(final String playerName) {
     AsyncRunner.runAsync(() -> getServerStartup().enablePlayer(playerName))
-        .exceptionally(e -> log.warn("Network communication error", e));
+        .exceptionally(this::logNetworkCommunicationError);
   }
 
   private void internalPlayerListingChanged(final PlayerListing listing) {
@@ -441,12 +457,16 @@ public class ClientModel implements IMessengerErrorListener {
     // disconnected.
     if (chatPanel != null) {
       Optional.ofNullable(chatPanel.getChat())
-          .ifPresent(chat -> chat.sendMessage("*** Was Disconnected ***"));
+          .ifPresent(
+              chat ->
+                  chat.sendMessage(
+                      I18nEngineFramework.get()
+                          .getString("startup.ClientModel.msg.WasDisconnected")));
     }
     EventThreadJOptionPane.showMessageDialog(
         ui,
-        "Connection to game host lost.\nPlease save and restart.",
-        "Connection Lost!",
+        I18nEngineFramework.get().getString("startup.ClientModel.dlg.ConnectionLost.Msg"),
+        I18nEngineFramework.get().getString("startup.ClientModel.dlg.ConnectionLost.Ttl"),
         JOptionPane.ERROR_MESSAGE);
   }
 

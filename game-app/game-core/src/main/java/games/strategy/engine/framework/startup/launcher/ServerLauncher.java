@@ -2,6 +2,8 @@ package games.strategy.engine.framework.startup.launcher;
 
 import games.strategy.engine.data.GameData;
 import games.strategy.engine.data.GamePlayer;
+import games.strategy.engine.framework.I18nEngineFramework;
+import games.strategy.engine.framework.I18nResourceBundle;
 import games.strategy.engine.framework.ServerGame;
 import games.strategy.engine.framework.message.PlayerListing;
 import games.strategy.engine.framework.startup.mc.ClientModel;
@@ -21,6 +23,7 @@ import games.strategy.net.websocket.ClientNetworkBridge;
 import games.strategy.triplea.UrlConstants;
 import games.strategy.triplea.settings.ClientSetting;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -99,13 +102,14 @@ public class ServerLauncher implements ILauncher {
     try {
       loadGame();
     } catch (final Exception e) {
-      log.error("Error when loading game", e);
+      log.error(I18nEngineFramework.get().getString("startup.ServerLauncher.err.LoadingGame"), e);
       abortLaunch = true;
     }
     ThreadRunner.runInNewThread(this::launchInternal);
   }
 
   private void loadGame() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     try {
       // the order of this stuff does matter
       serverModel.setServerLauncher(this);
@@ -114,7 +118,7 @@ public class ServerLauncher implements ILauncher {
         inGameLobbyWatcher.setGameStatus(GameDescription.GameStatus.LAUNCHING, null);
       }
       serverModel.allowRemoveConnections();
-      log.info("Game Status: Launching");
+      log.info(bundle.getString("startup.ServerLauncher.info.Launching"));
       messengers.registerRemote(serverReady, ClientModel.CLIENT_READY_CHANNEL);
       gameData.doPreGameStartDataModifications(playerListing);
       abortLaunch = testShouldWeAbort();
@@ -159,17 +163,19 @@ public class ServerLauncher implements ILauncher {
             .startGame(
                 serverGame, localPlayerSet, launchAction, serverModel.getChatModel().getChat());
       } catch (final Exception e) {
-        log.error("Failed to launch", e);
+        log.error(bundle.getString("startup.ServerLauncher.err.Launch"), e);
         abortLaunch = true;
       }
       log.info(
-          "Game Successfully Loaded. " + (abortLaunch ? "Aborting Launch." : "Starting Game."));
+          MessageFormat.format(
+              bundle.getString("startup.ServerLauncher.info.GameSuccessfully"),
+              abortLaunch ? 0 : 1));
       if (abortLaunch) {
         serverReady.countDownAll();
       }
       if (!serverReady.await(
           ClientSetting.serverStartGameSyncWaitTime.getValueOrThrow(), TimeUnit.SECONDS)) {
-        log.warn("Aborting launch - waiting for clients to be ready timed out!");
+        log.warn(bundle.getString("startup.ServerLauncher.warn.AbortLaunch"));
         abortLaunch = true;
       }
       messengers.unregisterRemote(ClientModel.CLIENT_READY_CHANNEL);
@@ -177,23 +183,24 @@ public class ServerLauncher implements ILauncher {
       if (inGameLobbyWatcher != null) {
         inGameLobbyWatcher.setGameStatus(GameDescription.GameStatus.IN_PROGRESS, serverGame);
       }
-      log.info("Game Status: In Progress");
+      log.info(bundle.getString("startup.ServerLauncher.info.GameInProgress"));
     }
   }
 
   private void launchInternal() {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     try {
       isLaunching = false;
       abortLaunch = testShouldWeAbort();
       if (!abortLaunch) {
-        log.info("Launching game - starting game delegates.");
+        log.info(bundle.getString("startup.ServerLauncher.info.StartingGameDelegates"));
         serverGame.startGame();
       } else {
-        log.info("Aborting game launch");
+        log.info(bundle.getString("startup.ServerLauncher.info.AbortingGameLaunch"));
         stopGame();
       }
     } catch (final RuntimeException e) {
-      log.info("Exception while launching", e);
+      log.info(bundle.getString("startup.ServerLauncher.info.ExceptionWhileLaunching"), e);
 
       // no-op, this is a simple player disconnect, no need to scare the user with some giant stack
       // trace
@@ -208,15 +215,15 @@ public class ServerLauncher implements ILauncher {
                     && !errorLatch.await(
                         ClientSetting.serverObserverJoinWaitTime.getValueOrThrow(),
                         TimeUnit.SECONDS)) {
-                  log.warn("Waiting on error latch timed out!");
+                  log.warn(
+                      bundle.getString("startup.ServerLauncher.err.WaitingOnErrorLatchTimedOut"));
                 }
               });
           stopGame();
         } else {
           final String errorMessage =
-              "Unrecognized error occurred. If this is a repeatable error, "
-                  + "please make a copy of this savegame and report to:\n"
-                  + UrlConstants.GITHUB_ISSUES;
+              bundle.getString(
+                  "startup.ServerLauncher.err.UnrecognizedError", UrlConstants.GITHUB_ISSUES);
           log.error(errorMessage, e);
           stopGame();
         }
@@ -232,7 +239,7 @@ public class ServerLauncher implements ILauncher {
     serverModel.newGame();
     launchAction.onGameInterrupt();
     if (inGameLobbyWatcher != null) {
-      log.info("Game Status: Waiting For Players");
+      log.info(bundle.getString("startup.ServerLauncher.info.WaitingForPlayers"));
       inGameLobbyWatcher.setGameStatus(GameDescription.GameStatus.WAITING_FOR_PLAYERS, null);
     }
   }
@@ -243,7 +250,8 @@ public class ServerLauncher implements ILauncher {
       final INode newNode) {
     if (isLaunching) {
       observersThatTriedToJoinDuringStartup.add(newNode);
-      nonBlockingObserver.cannotJoinGame("Game is launching, try again soon");
+      nonBlockingObserver.cannotJoinGame(
+          I18nEngineFramework.get().getString("startup.ServerLauncher.info.CannotJoinGame"));
       return;
     }
     serverGame.addObserver(blockingObserver, nonBlockingObserver, newNode);
@@ -289,22 +297,23 @@ public class ServerLauncher implements ILauncher {
   }
 
   private void saveAndEndGame(final INode node) {
+    final I18nResourceBundle bundle = I18nEngineFramework.get();
     // a hack, if headless save to the autosave to avoid polluting our savegames folder with a
     // million saves
     final Path f = launchAction.getAutoSaveFile();
     try {
       serverGame.saveGame(f);
     } catch (final Exception e) {
-      log.error("Failed to save game: " + f.toAbsolutePath(), e);
+      log.error(bundle.getString("startup.ServerLauncher.err.SaveGame", f.toAbsolutePath()), e);
     }
 
     stopGame();
 
     final String message =
-        "Connection lost to:"
-            + node.getName()
-            + " game is over.  Game saved to:"
-            + f.getFileName().toString();
+        MessageFormat.format(
+            bundle.getString("startup.ServerLauncher.msg.ConnectionLost"),
+            node.getName(),
+            f.getFileName().toString());
     launchAction.onEnd(message);
   }
 

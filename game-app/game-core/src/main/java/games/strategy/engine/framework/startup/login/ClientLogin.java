@@ -1,6 +1,7 @@
 package games.strategy.engine.framework.startup.login;
 
 import com.google.common.annotations.VisibleForTesting;
+import games.strategy.engine.framework.I18nEngineFramework;
 import games.strategy.net.IConnectionLogin;
 import java.awt.Component;
 import java.util.HashMap;
@@ -74,7 +75,10 @@ public class ClientLogin implements IConnectionLogin {
                             }
                           };
                       optionPane
-                          .createDialog(parentComponent, "Enter a password to join the game")
+                          .createDialog(
+                              parentComponent,
+                              I18nEngineFramework.get()
+                                  .getString("startup.ClientLogin.dlg.Password.Ttl"))
                           .setVisible(true);
                       return new String(passwordField.getPassword());
                     }))
