@@ -387,8 +387,6 @@ public class ClientModel implements IMessengerErrorListener {
         });
   }
 
-
-
   public void takePlayer(final String playerName) {
     AsyncRunner.runAsync(() -> getServerStartup().takePlayer(messenger.getLocalNode(), playerName))
         .exceptionally(this::logNetworkCommunicationError);

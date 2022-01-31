@@ -293,8 +293,7 @@ public class ClientSetupPanel extends SetupPanel {
         playerComponent = button;
         alliance.setToolTipText(
             MessageFormat.format(
-                bundle.getString("Button.Alliance.tltp.Play"),
-                alliance.getText()));
+                bundle.getString("Button.Alliance.tltp.Play"), alliance.getText()));
         allianceComponent = alliance;
       } else {
         playerLabel.setText(userName.getValue());

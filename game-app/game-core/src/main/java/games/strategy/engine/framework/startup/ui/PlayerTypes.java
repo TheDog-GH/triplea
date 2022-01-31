@@ -67,7 +67,9 @@ public class PlayerTypes {
                 new IllegalStateException(
                     I18nEngineFramework.get()
                         .getString("startup.PlayerTypes.err.FindPlayerType", label)));
-  }  public static final Type HUMAN_PLAYER =
+  }
+
+  public static final Type HUMAN_PLAYER =
       new Type(I18nEngineFramework.get().getString("Player.Human")) {
         @Override
         public Player newPlayerWithName(final String name) {
@@ -79,8 +81,6 @@ public class PlayerTypes {
           };
         }
       };
-
-
 
   /** A hidden player type to represent network connected players. */
   public static final Type CLIENT_PLAYER =
@@ -120,8 +120,6 @@ public class PlayerTypes {
   public String[] getAvailablePlayerLabels() {
     return playerTypes.stream().filter(Type::isVisible).map(Type::getLabel).toArray(String[]::new);
   }
-
-
 
   /**
    * PlayerType indicates what kind of entity is controlling a player, whether an AI, human, or a
