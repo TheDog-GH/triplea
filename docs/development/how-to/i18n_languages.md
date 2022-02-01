@@ -7,9 +7,14 @@
 - Currently the focus is the extraction of translatable strings into *.properties files
 - Subclasses of class I18nResourceBundle build a wrapper to allow singleton instantiation for a whole
   sub-package-branch (see class I18nEngineFramework)
-- Each translatable string under the branch should be replaced via a call to the respective i18n-class
+- Each _translatable_ string under the branch should be replaced via a call to the respective i18n-class
+- Technical strings such as properties or keys **must not** be extracted!
 - Special rules need to be applied for numbers, currencies, dates, times and messages with
   parameters ([java formatting](https://docs.oracle.com/javase/tutorial/i18n/format/index.html))
+
+Example games.strategy.engine.framework.startup.ui.ServerSetupPanel.java:
+- Before: `alliance.setToolTipText("Click to play " + alliance.getText());`
+- After: `alliance.setToolTipText( I18nEngineFramework.get().getString("Button.Alliance.tltp.Play", alliance.getText()));` with *.properties entry `Button.Alliance.tltp.Play=Click to play {0}`
 
 ## FAQ answered
 
