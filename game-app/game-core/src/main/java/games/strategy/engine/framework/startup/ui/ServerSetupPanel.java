@@ -16,6 +16,7 @@ import games.strategy.engine.framework.startup.ui.panels.main.game.selector.Game
 import games.strategy.engine.lobby.client.ui.action.EditGameCommentAction;
 import games.strategy.engine.lobby.client.ui.action.RemoveGameFromLobbyAction;
 import games.strategy.net.IServerMessenger;
+import games.strategy.ui.Util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -330,9 +331,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
   }
 
   private void internalPlayersTakenChanged() {
-    if (!SwingUtilities.isEventDispatchThread()) {
-      throw new IllegalStateException("Wrong thread");
-    }
+    Util.ensureOnEventDispatchThread();
     final Map<String, String> playersToNode = model.getPlayersToNodeListing();
     final Map<String, Boolean> playersEnabled = model.getPlayersEnabledListing();
     for (final PlayerRow row : playerRows) {
@@ -342,9 +341,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
   }
 
   private void internalPlayerListChanged() {
-    if (!SwingUtilities.isEventDispatchThread()) {
-      throw new IllegalStateException("Wrong thread");
-    }
+    Util.ensureOnEventDispatchThread();
     playerRows = new ArrayList<>();
     final Map<String, String> players = model.getPlayersToNodeListing();
     final Map<String, Boolean> playersEnabled = model.getPlayersEnabledListing();
