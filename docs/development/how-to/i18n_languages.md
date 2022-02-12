@@ -19,6 +19,8 @@ Example games.strategy.engine.framework.startup.ui.ServerSetupPanel.java:
 ## FAQ answered
 
 ### General Questions
+1. What do I have to do to make a string translatable?
+Follow guide [How-To i18nize a string/message](./i18n_how-to.md).
 
 ### Quantity Questions
 
