@@ -26,7 +26,7 @@ import org.triplea.util.Version;
 @RequiredArgsConstructor
 public final class ClientLoginValidator implements ILoginValidator {
   static final String PASSWORD_REQUIRED_PROPERTY =
-      I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.PasswordRequired");
+      I18nEngineFramework.get().getString("PasswordRequired");
 
   private final Version engineVersion;
   @Setter private IServerMessenger serverMessenger;
@@ -42,8 +42,7 @@ public final class ClientLoginValidator implements ILoginValidator {
       final InetSocketAddress remoteAddress) {
     final String versionString = propertiesReadFromClient.get(ClientLogin.ENGINE_VERSION_PROPERTY);
     if (versionString == null || versionString.length() > 20 || versionString.isBlank()) {
-      return I18nEngineFramework.get()
-          .getString("startup.ClientLoginValidator.err.InvalidVersion", versionString);
+      return I18nEngineFramework.get().getString("InvalidVersion", versionString);
     }
 
     // check for version
@@ -103,11 +102,8 @@ public final class ClientLoginValidator implements ILoginValidator {
   @VisibleForTesting
   interface ErrorMessages {
     String NO_ERROR = null;
-    String INVALID_PASSWORD =
-        I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.InvalidPassword");
-    String UNABLE_TO_OBTAIN_MAC =
-        I18nEngineFramework.get()
-            .getString("startup.ClientLoginValidator.str.UnableToObtainMacAddress");
+    String INVALID_PASSWORD = I18nEngineFramework.get().getString("InvalidPassword");
+    String UNABLE_TO_OBTAIN_MAC = I18nEngineFramework.get().getString("UnableToObtainMacAddress");
     String YOU_HAVE_BEEN_BANNED =
         I18nEngineFramework.get().getString("startup.ClientLoginValidator.str.HostHasBannedYou");
   }

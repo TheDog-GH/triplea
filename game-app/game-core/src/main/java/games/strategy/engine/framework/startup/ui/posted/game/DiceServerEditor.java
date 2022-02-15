@@ -66,7 +66,7 @@ public class DiceServerEditor extends JPanel {
             .build();
 
     testDiceButton = new JButton(bundle.getString("startup.DiceServerEditor.btn.Test.Txt"));
-    toLabel = new JLabel(bundle.getString("startup.DiceServerEditor.lbl.To"));
+    toLabel = new JLabel(bundle.getString("To"));
     ccLabel = new JLabel(bundle.getString("startup.DiceServerEditor.lbl.Cc"));
 
     this.readyCallback = readyCallback;
@@ -86,7 +86,7 @@ public class DiceServerEditor extends JPanel {
         .getValueOrThrow()
         .equals(ClientSetting.diceRollerUri.getDefaultValue().orElseThrow())) {
       diceRollerOptions.add(
-          new JLabel(bundle.getString("startup.DiceServerEditor.DiceRollerOptions.lbl.DiceServer")),
+          new JLabel(bundle.getString("DiceServer")),
           new GridBagConstraints(
               0,
               row,

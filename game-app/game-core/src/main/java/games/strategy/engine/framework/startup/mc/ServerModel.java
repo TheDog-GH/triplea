@@ -588,7 +588,7 @@ public class ServerModel extends Observable implements IConnectionChangeListener
                       e ->
                           log.warn(
                               I18nEngineFramework.get()
-                                  .getString("startup.ClientModel.warn.NetworkCommunicationError"),
+                                  .getString("NetworkCommunicationError"),
                               e));
             });
   }

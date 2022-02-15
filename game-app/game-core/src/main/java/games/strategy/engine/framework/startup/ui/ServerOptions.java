@@ -143,13 +143,12 @@ public class ServerOptions extends JDialog {
     buttons.add(
         new JButton(
             SwingAction.of(
-                bundle.getString("Option.OK"),
+                bundle.getString("OK"),
                 e -> {
                   setVisible(false);
                   okPressed = true;
                 })));
-    buttons.add(
-        new JButton(SwingAction.of(bundle.getString("Option.Cancel"), e -> setVisible(false))));
+    buttons.add(new JButton(SwingAction.of(bundle.getString("Cancel"), e -> setVisible(false))));
     content.add(buttons, BorderLayout.SOUTH);
   }
 

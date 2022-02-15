@@ -295,15 +295,13 @@ public final class GameSelectorPanel extends JPanel implements Observer {
     scroll.setBorder(null);
     scroll.getViewport().setBorder(null);
     final JOptionPane pane = new JOptionPane(scroll, JOptionPane.PLAIN_MESSAGE);
-    final String ok = bundle.getString("Option.OK");
-    final String cancel = bundle.getString("Option.Cancel");
-    final String makeDefault = bundle.getString("Option.MakeDefault");
-    final String reset = bundle.getString("Option.Reset");
+    final String ok = bundle.getString("OK");
+    final String cancel = bundle.getString("Cancel");
+    final String makeDefault = bundle.getString("MakeDefault");
+    final String reset = bundle.getString("Reset");
     pane.setOptions(new Object[] {ok, makeDefault, reset, cancel});
     final JDialog window =
-        pane.createDialog(
-            JOptionPane.getFrameForComponent(this),
-            bundle.getString("startup.GameSelectorPanel.dlg.GameOptions"));
+        pane.createDialog(JOptionPane.getFrameForComponent(this), bundle.getString("GameOptions"));
     window.setVisible(true);
     final Object buttonPressed = pane.getValue();
     if (buttonPressed == null || buttonPressed.equals(cancel)) {

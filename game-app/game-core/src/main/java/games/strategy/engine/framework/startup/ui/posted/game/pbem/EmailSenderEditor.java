@@ -91,7 +91,7 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
             .toolTip(bundle.getString("Button.Help.Tltp"))
             .build();
 
-    smtpServerLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.SmtpServer"));
+    smtpServerLabel = new JLabel(bundle.getString("SmtpServer"));
     smtpServerField =
         JTextFieldBuilder.builder()
             .text(viewModel.getSmtpServer())
@@ -104,7 +104,7 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
             .columns(FIELD_LENGTH)
             .build();
 
-    smtpPortLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.Port"));
+    smtpPortLabel = new JLabel(bundle.getString("Port"));
     smtpPortField =
         JTextFieldBuilder.builder()
             .text(viewModel.getSmtpPort())
@@ -128,7 +128,7 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
                 })
             .build();
 
-    subjectLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.Subject"));
+    subjectLabel = new JLabel(bundle.getString("Subject"));
     subjectField =
         JTextFieldBuilder.builder()
             .text(viewModel.getSubject())
@@ -141,7 +141,7 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
             .columns(FIELD_LENGTH)
             .build();
 
-    toAddressLabel = new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.To"));
+    toAddressLabel = new JLabel(bundle.getString("To"));
     toAddressField =
         JTextFieldBuilder.builder()
             .text(viewModel.getToAddress())
@@ -225,7 +225,7 @@ public class EmailSenderEditor implements ViewModelListener<EmailSenderEditorVie
 
     row++;
     contents.add(
-        new JLabel(bundle.getString("startup.EmailSenderEditor.lbl.EmailProvider")),
+        new JLabel(bundle.getString("EmailProvider")),
         new GridBagConstraintsBuilder(0, row).build());
     contents.add(emailProviderSelectionBox, new GridBagConstraintsBuilder(1, row).build());
     contents.add(helpButton, new GridBagConstraintsBuilder(2, row).build());

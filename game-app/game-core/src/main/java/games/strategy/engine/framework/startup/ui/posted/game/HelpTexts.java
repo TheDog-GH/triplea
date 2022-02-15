@@ -27,15 +27,13 @@ public class HelpTexts {
   public static String gmailHelpText() {
     final I18nResourceBundle bundle = I18nEngineFramework.get();
     return emailProviderHelpText(
-        bundle.getString("startup.HelpTexts.str.Gmail"),
-        bundle.getString("startup.HelpTexts.str.GmailPossessive"));
+        bundle.getString("Gmail"), bundle.getString("startup.HelpTexts.str.GmailPossessive"));
   }
 
   public static String hotmailHelpText() {
     final I18nResourceBundle bundle = I18nEngineFramework.get();
     return emailProviderHelpText(
-        bundle.getString("startup.HelpTexts.str.Hotmail"),
-        bundle.getString("startup.HelpTexts.str.HotmailPossessive"));
+        bundle.getString("Hotmail"), bundle.getString("startup.HelpTexts.str.HotmailPossessive"));
   }
 
   private static String emailProviderHelpText(final String name, final String possessiveName) {

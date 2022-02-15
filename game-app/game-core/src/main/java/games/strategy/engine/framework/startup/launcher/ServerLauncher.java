@@ -196,11 +196,11 @@ public class ServerLauncher implements ILauncher {
         log.info(bundle.getString("startup.ServerLauncher.info.StartingGameDelegates"));
         serverGame.startGame();
       } else {
-        log.info(bundle.getString("startup.ServerLauncher.info.AbortingGameLaunch"));
+        log.info(bundle.getString("AbortingGameLaunch"));
         stopGame();
       }
     } catch (final RuntimeException e) {
-      log.info(bundle.getString("startup.ServerLauncher.info.ExceptionWhileLaunching"), e);
+      log.info(bundle.getString("ExceptionWhileLaunching"), e);
 
       // no-op, this is a simple player disconnect, no need to scare the user with some giant stack
       // trace

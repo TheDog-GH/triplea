@@ -189,8 +189,7 @@ final class HmacSha512Authenticator {
       final byte[] expectedDigest = digest(password, salt, nonce);
       if (!MessageDigest.isEqual(expectedDigest, actualDigest)) {
         throw new AuthenticationException(
-            I18nEngineFramework.get()
-                .getString("startup.HmacSha512Authenticator.err.AuthenticationFailed"));
+            I18nEngineFramework.get().getString("AuthenticationFailed"));
       }
     } catch (final GeneralSecurityException e) {
       throw new AuthenticationException(
@@ -207,8 +206,7 @@ final class HmacSha512Authenticator {
     final byte[] value = decodeOptionalProperty(properties, name);
     if (value == null) {
       throw new AuthenticationException(
-          I18nEngineFramework.get()
-              .getString("startup.HmacSha512Authenticator.err.MissingProperty", name));
+          I18nEngineFramework.get().getString("MissingProperty", name));
     }
 
     return value;

@@ -118,9 +118,7 @@ public class ClientModel implements IMessengerErrorListener {
               () -> {
                 typePanelModel.showSelectType();
                 EventThreadJOptionPane.showMessageDialog(
-                    ui,
-                    I18nEngineFramework.get()
-                        .getString("startup.ClientModel.dlg.CouldNotJoin.Msg", reason));
+                    ui, I18nEngineFramework.get().getString("CouldNotJoinGameDp", reason));
               });
         }
       };
@@ -164,14 +162,13 @@ public class ClientModel implements IMessengerErrorListener {
         Interruptibles.awaitResult(() -> SwingAction.invokeAndWaitResult(WaitWindow::new));
     if (!window.completed) {
       throw new IllegalStateException(
-          I18nEngineFramework.get().getString("startup.ClientModel.err.WhileCreatingWaitWindow"));
+          I18nEngineFramework.get().getString("ErrorWhileCreatingWaitWin"));
     }
     gameLoadingWindow =
         window.result.orElseThrow(
             () ->
                 new IllegalStateException(
-                    I18nEngineFramework.get()
-                        .getString("startup.ClientModel.err.ConstructorNoInstance")));
+                    I18nEngineFramework.get().getString("ConstructorDidNotReturnIn")));
   }
 
   private static ClientProps getProps(final Component ui) {
@@ -208,7 +205,7 @@ public class ClientModel implements IMessengerErrorListener {
                     }));
     if (!result.completed) {
       throw new IllegalStateException(
-          I18nEngineFramework.get().getString("startup.ClientModel.err.DuringComponentCreation"));
+          I18nEngineFramework.get().getString("ErrorDuringComponentCreat"));
     }
     return result.result.orElse(null);
   }
@@ -217,11 +214,7 @@ public class ClientModel implements IMessengerErrorListener {
     this.listener = Preconditions.checkNotNull(listener);
     AsyncRunner.runAsync(() -> internalPlayerListingChanged(getServerStartup().getPlayerListing()))
         .exceptionally(
-            e ->
-                log.warn(
-                    I18nEngineFramework.get()
-                        .getString("startup.ClientModel.warn.NetworkCommunicationError"),
-                    e));
+            e -> log.warn(I18nEngineFramework.get().getString("NetworkCommunicationError"), e));
   }
 
   /**
@@ -261,10 +254,10 @@ public class ClientModel implements IMessengerErrorListener {
       EventThreadJOptionPane.showMessageDialog(this.ui, e.getMessage());
       return false;
     } catch (final Exception ioe) {
-      log.info(bundle.getString("startup.ClientModel.info.ErrorConnectingToHost"), ioe);
+      log.info(bundle.getString("ErrorConnectingToHost"), ioe);
       SwingComponents.showError(
           ui,
-          bundle.getString("startup.ClientModel.err.ConnectingToHost.Ttl"),
+          bundle.getString("ErrorConnectingToHost"),
           bundle.getString(
               "startup.ClientModel.err.ConnectingToHost.Msg",
               ioe.getMessage(),
@@ -456,10 +449,7 @@ public class ClientModel implements IMessengerErrorListener {
     if (chatPanel != null) {
       Optional.ofNullable(chatPanel.getChat())
           .ifPresent(
-              chat ->
-                  chat.sendMessage(
-                      I18nEngineFramework.get()
-                          .getString("startup.ClientModel.msg.WasDisconnected")));
+              chat -> chat.sendMessage(I18nEngineFramework.get().getString("WasDisconnected")));
     }
     EventThreadJOptionPane.showMessageDialog(
         ui,

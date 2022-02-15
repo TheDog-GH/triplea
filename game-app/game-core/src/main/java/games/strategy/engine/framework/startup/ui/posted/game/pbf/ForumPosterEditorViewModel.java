@@ -110,7 +110,7 @@ class ForumPosterEditorViewModel {
                     () ->
                         BackgroundTaskRunner.runInBackgroundAndReturn(
                             I18nEngineFramework.get()
-                                .getString("startup.ForumPosterEditorViewModel.msg.LoggingIn"),
+                                .getString("LoggingIn"),
                             this::renewToken))
                 .result
             : Optional.of(renewToken());

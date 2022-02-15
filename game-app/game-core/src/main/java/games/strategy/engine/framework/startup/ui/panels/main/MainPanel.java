@@ -67,8 +67,7 @@ public class MainPanel extends JPanel {
             .build();
     playButton.addActionListener(e -> launchAction.accept(this));
 
-    cancelButton =
-        new JButtonBuilder().title(bundle.getString("startup.MainPanel.btn.Cancel")).build();
+    cancelButton = new JButtonBuilder().title(bundle.getString("Cancel")).build();
     cancelButton.addActionListener(e -> cancelAction.run());
 
     gameSelectorPanel.setBorder(new EtchedBorder());
@@ -119,8 +118,7 @@ public class MainPanel extends JPanel {
 
   private static void createUserActionMenu(final JPanel cancelPanel, final List<Action> actions) {
     // if we need this for something other than network, add a way to set it
-    final JButton button =
-        new JButton(I18nEngineFramework.get().getString("startup.MainPanel.btn.Network"));
+    final JButton button = new JButton(I18nEngineFramework.get().getString("Network"));
     button.addActionListener(
         e -> {
           final JPopupMenu menu = new JPopupMenu();

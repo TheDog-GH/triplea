@@ -21,21 +21,21 @@ public class PlayerTypes {
   public static final String DOES_NOTHING_PLAYER_LABEL = "Does Nothing (AI)";
 
   public static final Type WEAK_AI =
-      new Type(I18nEngineFramework.get().getString("Player.WeakAI")) {
+      new Type(I18nEngineFramework.get().getString("WeakAI")) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new WeakAi(name);
         }
       };
   public static final Type FAST_AI =
-      new Type(I18nEngineFramework.get().getString("Player.FastAI")) {
+      new Type(I18nEngineFramework.get().getString("FastAI")) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new FastAi(name);
         }
       };
   public static final Type PRO_AI =
-      new Type(I18nEngineFramework.get().getString("Player.HardAI")) {
+      new Type(I18nEngineFramework.get().getString("HardAI")) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new ProAi(name);
@@ -43,7 +43,7 @@ public class PlayerTypes {
       };
   /** A 'dummy' player type used for battle calc. */
   public static final Type BATTLE_CALC_DUMMY =
-      new Type(I18nEngineFramework.get().getString("Player.NoneAI"), false) {
+      new Type(I18nEngineFramework.get().getString("NoneAI"), false) {
         @Override
         public Player newPlayerWithName(final String name) {
           throw new UnsupportedOperationException(
@@ -70,7 +70,7 @@ public class PlayerTypes {
   }
 
   public static final Type HUMAN_PLAYER =
-      new Type(I18nEngineFramework.get().getString("Player.Human")) {
+      new Type(I18nEngineFramework.get().getString("Human")) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new TripleAPlayer(name) {
@@ -84,7 +84,7 @@ public class PlayerTypes {
 
   /** A hidden player type to represent network connected players. */
   public static final Type CLIENT_PLAYER =
-      new Type(I18nEngineFramework.get().getString("Player.Client"), false) {
+      new Type(I18nEngineFramework.get().getString("Client"), false) {
         @Override
         public Player newPlayerWithName(final String name) {
           return new TripleAPlayer(name) {

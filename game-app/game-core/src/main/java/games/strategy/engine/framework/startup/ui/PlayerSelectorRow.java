@@ -78,7 +78,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
 
     this.playerTypes = new JComboBox<>(this.playerTypesProvider.getAvailablePlayerLabels());
     String previousSelection = reloadSelections.get(playerName);
-    if (previousSelection.equalsIgnoreCase(bundle.getString("Player.Client"))) {
+    if (previousSelection.equalsIgnoreCase(bundle.getString("Client"))) {
       previousSelection = PlayerTypes.HUMAN_PLAYER.getLabel();
     }
     if (List.of(this.playerTypesProvider.getAvailablePlayerLabels()).contains(previousSelection)) {
@@ -109,7 +109,7 @@ public class PlayerSelectorRow implements PlayerCountrySelection {
     incomePercentageLabel = new JLabel("%");
     puIncomeBonus =
         gameProperties.getPlayerProperty(Constants.getPuIncomeBonus(player)).getEditorComponent();
-    puIncomeBonusLabel = new JLabel(bundle.getString("Label.Pus"));
+    puIncomeBonusLabel = new JLabel(bundle.getString("Pus"));
 
     setWidgetActivation();
   }

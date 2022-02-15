@@ -222,7 +222,7 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
       layout.setConstraints(enableLabel, enabledPlayerConstraints);
       players.add(enableLabel);
     }
-    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
+    final JLabel nameLabel = new JLabel(bundle.getString("Name"));
     nameLabel.setForeground(Color.black);
     layout.setConstraints(nameLabel, nameConstraints);
     players.add(nameLabel);
@@ -231,15 +231,15 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
     playedByLabel.setForeground(Color.black);
     layout.setConstraints(playedByLabel, playerConstraints);
     players.add(playedByLabel);
-    final JLabel localLabel = new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.Local"));
+    final JLabel localLabel = new JLabel(bundle.getString("Local"));
     localLabel.setForeground(Color.black);
     layout.setConstraints(localLabel, localConstraints);
     players.add(localLabel);
-    final JLabel typeLabel = new JLabel(bundle.getString("startup.ServerSetupPanel.lbl.Type"));
+    final JLabel typeLabel = new JLabel(bundle.getString("Type"));
     typeLabel.setForeground(Color.black);
     layout.setConstraints(typeLabel, typeConstraints);
     players.add(typeLabel);
-    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
+    final JLabel allianceLabel = new JLabel(bundle.getString("Alliance"));
     allianceLabel.setForeground(Color.black);
     layout.setConstraints(allianceLabel, allianceConstraints);
     players.add(allianceLabel);
@@ -382,15 +382,15 @@ public class ServerSetupPanel extends SetupPanel implements IRemoteModelListener
       final String[] playerTypes = playerTypesProvider.getAvailablePlayerLabels();
       type = new JComboBox<>(playerTypes);
       String previousSelection = reloadSelections.get(playerName);
-      if (previousSelection.equalsIgnoreCase(bundle.getString("Player.Client"))) {
+      if (previousSelection.equalsIgnoreCase(bundle.getString("Client"))) {
         previousSelection = playerTypes[0];
       }
-      if (!previousSelection.equals(bundle.getString("Player.NoOne"))
+      if (!previousSelection.equals(bundle.getString("NoOne"))
           && List.of(playerTypes).contains(previousSelection)) {
         type.setSelectedItem(previousSelection);
         model.setLocalPlayerType(
             nameLabel.getText(), playerTypesProvider.fromLabel((String) type.getSelectedItem()));
-      } else if (playerName.startsWith(bundle.getString("Player.StartNeutral"))
+      } else if (playerName.startsWith(bundle.getString("StartNeutral"))
           || playerName.startsWith("AI")) {
         // the 4th in the list should be Pro AI (Hard AI)
         type.setSelectedItem(PlayerTypes.PRO_AI.getLabel());

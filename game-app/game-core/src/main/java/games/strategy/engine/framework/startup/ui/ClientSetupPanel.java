@@ -127,7 +127,7 @@ public class ClientSetupPanel extends SetupPanel {
       layout.setConstraints(enableLabel, enabledPlayerConstraints);
       players.add(enableLabel);
     }
-    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
+    final JLabel nameLabel = new JLabel(bundle.getString("Name"));
     nameLabel.setForeground(Color.black);
     layout.setConstraints(nameLabel, nameConstraints);
     players.add(nameLabel);
@@ -138,7 +138,7 @@ public class ClientSetupPanel extends SetupPanel {
     final JLabel playedByLabel = new JLabel("                    ");
     layout.setConstraints(playedByLabel, playConstraints);
     players.add(playedByLabel);
-    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
+    final JLabel allianceLabel = new JLabel(bundle.getString("Alliance"));
     layout.setConstraints(allianceLabel, allianceConstraints);
     players.add(allianceLabel);
     for (final PlayerRow row : playerRows) {

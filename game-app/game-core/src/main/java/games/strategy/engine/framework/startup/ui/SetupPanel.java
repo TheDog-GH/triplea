@@ -58,7 +58,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
     playerRows.clear();
     panel.setLayout(new GridBagLayout());
     if (data == null) {
-      panel.add(new JLabel(bundle.getString("startup.SetupPanel.lbl.NoGameSelected")));
+      panel.add(new JLabel(bundle.getString("NoGameSelected")));
       return;
     }
 
@@ -102,7 +102,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel nameLabel = new JLabel(bundle.getString("Label.Name"));
+    final JLabel nameLabel = new JLabel(bundle.getString("Name"));
     panel.add(
         nameLabel,
         new GridBagConstraints(
@@ -135,7 +135,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel typeLabel = new JLabel(bundle.getString("startup.SetupPanel.lbl.Type"));
+    final JLabel typeLabel = new JLabel(bundle.getString("Type"));
     panel.add(
         typeLabel,
         new GridBagConstraints(
@@ -150,7 +150,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(0, 5, 5, 0),
             0,
             0));
-    final JLabel allianceLabel = new JLabel(bundle.getString("Label.Alliance"));
+    final JLabel allianceLabel = new JLabel(bundle.getString("Alliance"));
     panel.add(
         allianceLabel,
         new GridBagConstraints(
@@ -180,7 +180,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             new Insets(5, 5, 15, 0),
             0,
             0));
-    final JLabel incomeLabel = new JLabel(bundle.getString("startup.SetupPanel.lbl.Income"));
+    final JLabel incomeLabel = new JLabel(bundle.getString("Income"));
     panel.add(
         incomeLabel,
         new GridBagConstraints(
@@ -197,8 +197,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
             0));
     incomeLabel.setVisible(false);
     gridx++;
-    final JLabel puIncomeBonusLabel =
-        new JLabel(bundle.getString("startup.SetupPanel.lbl.BonusIncome"));
+    final JLabel puIncomeBonusLabel = new JLabel(bundle.getString("BonusIncome"));
     panel.add(
         puIncomeBonusLabel,
         new GridBagConstraints(
@@ -237,7 +236,7 @@ public abstract class SetupPanel extends JPanel implements SetupModel {
 
     resourceModifiers.setAction(
         SwingAction.of(
-            bundle.getString("startup.SetupPanel.act.ResourceModifiers"),
+            bundle.getString("ResourceModifiers"),
             e -> {
               final boolean isVisible = incomeLabel.isVisible();
               incomeLabel.setVisible(!isVisible);

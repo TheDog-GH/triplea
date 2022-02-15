@@ -17,10 +17,8 @@ import org.triplea.java.StringUtils;
 import org.triplea.java.ViewModelListener;
 
 class EmailSenderEditorViewModel {
-  static final String PROVIDER_DISABLED =
-      I18nEngineFramework.get().getString("startup.EmailSenderEditorViewModel.str.Disabled");
-  static final String GENERIC_SMTP =
-      I18nEngineFramework.get().getString("startup.EmailSenderEditorViewModel.str.GenericSmtp");
+  static final String PROVIDER_DISABLED = I18nEngineFramework.get().getString("Disabled");
+  static final String GENERIC_SMTP = I18nEngineFramework.get().getString("GenericSmtp");
 
   private final ViewModelListener<EmailSenderEditorViewModel> view;
 
