@@ -30,7 +30,8 @@ public final class FileUtils {
 
   public static Path newTempFolder() {
     try {
-      return Files.createTempDirectory("triplea");
+      return Files.createTempDirectory(
+          "triplea"); // no reuse of constant possible to avoid circular dependency
     } catch (final IOException e) {
       throw new FileSystemException(e);
     }

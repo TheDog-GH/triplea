@@ -149,7 +149,8 @@ public abstract class ClientSetting<T> implements GameSetting<T> {
   public static final ClientSetting<Path> userMapsFolderPath =
       new PathClientSetting(
           "USER_MAPS_FOLDER_PATH",
-          ClientFileSystemHelper.getUserRootFolder().resolve("downloadedMaps"));
+          ClientFileSystemHelper.getUserRootFolder()
+              .resolve(ClientFileSystemHelper.FOLDER_NAME_USER_MAPS));
   public static final ClientSetting<Integer> wheelScrollAmount =
       new IntegerClientSetting("WHEEL_SCROLL_AMOUNT", 60);
   public static final ClientSetting<String> playerName =

@@ -1,5 +1,6 @@
 package org.triplea.debug.error.reporting.formatting;
 
+import games.strategy.engine.ClientFileSystemHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -64,7 +65,9 @@ public class ErrorReportTitleFormatter {
         .flatMap(Arrays::stream)
         .filter(
             stackTraceElement ->
-                stackTraceElement.getClassName().contains("triplea")
+                stackTraceElement
+                        .getClassName()
+                        .contains(ClientFileSystemHelper.FOLDER_NAME_USER_ROOT)
                     || stackTraceElement.getClassName().contains("games.strategy"))
         .findFirst()
         .map(ErrorReportTitleFormatter::formatStackTraceElement);

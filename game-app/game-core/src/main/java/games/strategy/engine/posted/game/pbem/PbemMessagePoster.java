@@ -1,5 +1,6 @@
 package games.strategy.engine.posted.game.pbem;
 
+import games.strategy.engine.ClientFileSystemHelper;
 import games.strategy.engine.data.GameData;
 import games.strategy.engine.data.GamePlayer;
 import games.strategy.engine.data.GameState;
@@ -252,7 +253,10 @@ public class PbemMessagePoster implements Serializable {
               postingDelegate.setHasPostedTurnSummary(true);
             }
             try {
-              saveGameFile = Files.createTempFile("triplea", GameDataFileUtils.getExtension());
+              saveGameFile =
+                  Files.createTempFile(
+                      ClientFileSystemHelper.FOLDER_NAME_USER_ROOT,
+                      GameDataFileUtils.getExtension());
               frame.getGame().saveGame(saveGameFile);
               setSaveGame(saveGameFile);
             } catch (final Exception e) {

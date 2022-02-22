@@ -19,6 +19,10 @@ import org.triplea.util.Services;
 /** Provides methods to work with common file locations in a client installation. */
 @Slf4j
 public final class ClientFileSystemHelper {
+
+  public static final String FOLDER_NAME_USER_MAPS = "downloadedMaps";
+  public static final String FOLDER_NAME_USER_ROOT = "triplea";
+
   private ClientFileSystemHelper() {}
 
   /**
@@ -71,8 +75,8 @@ public final class ClientFileSystemHelper {
    */
   public static Path getUserRootFolder() {
     final Path userHome = Path.of(SystemProperties.getUserHome());
-    final Path rootDir = userHome.resolve("Documents").resolve("triplea");
-    return Files.exists(rootDir) ? rootDir : userHome.resolve("triplea");
+    final Path rootDir = userHome.resolve("Documents").resolve(FOLDER_NAME_USER_ROOT);
+    return Files.exists(rootDir) ? rootDir : userHome.resolve(FOLDER_NAME_USER_ROOT);
   }
 
   /**
@@ -90,7 +94,7 @@ public final class ClientFileSystemHelper {
   @VisibleForTesting
   static Path getUserMapsFolder(final Supplier<Path> userHomeRootFolderSupplier) {
     final Path defaultDownloadedMapsFolder =
-        userHomeRootFolderSupplier.get().resolve("downloadedMaps");
+        userHomeRootFolderSupplier.get().resolve(FOLDER_NAME_USER_MAPS);
 
     // make sure folder override location is valid, if not notify user and reset it.
     final Optional<Path> path = ClientSetting.mapFolderOverride.getValue();
@@ -106,7 +110,7 @@ public final class ClientFileSystemHelper {
     final Path mapsFolder =
         ClientSetting.mapFolderOverride
             .getValue()
-            .orElseGet(() -> userHomeRootFolderSupplier.get().resolve("downloadedMaps"));
+            .orElseGet(() -> userHomeRootFolderSupplier.get().resolve(FOLDER_NAME_USER_MAPS));
 
     if (!Files.exists(mapsFolder)) {
       try {
