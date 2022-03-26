@@ -263,10 +263,10 @@ public class ServerLauncher implements ILauncher {
    * example, a disconnected participant will cause the game to be stopped, while a disconnected
    * observer will have no effect.
    */
-  public void connectionLost(final INode node) {
+  public void connectionLost(final INode droppedNode) {
     if (isLaunching) {
       // this is expected, we told the observer he couldn't join, so now we lose the connection
-      if (observersThatTriedToJoinDuringStartup.remove(node)) {
+      if (observersThatTriedToJoinDuringStartup.remove(droppedNode)) {
         return;
       }
       // a player has dropped out, abort
@@ -276,9 +276,15 @@ public class ServerLauncher implements ILauncher {
     }
     // if we lose a connection to a player, shut down the game (after saving) and go back to the
     // main screen
-    if (serverGame.getPlayerManager().isPlaying(node)) {
+    if (serverGame.getPlayerManager().isPlaying(droppedNode)) {
       if (serverGame.isGameSequenceRunning()) {
-        saveAndEndGame(node);
+        saveAndEndGame(droppedNode);
+        // Release any countries played by the player that dropped. The other seating assignments
+        // are preserved for the game lobby that will be shown.
+        for (final String countryName : serverGame.getPlayerManager().getPlayedBy(droppedNode)) {
+          serverModel.releasePlayer(countryName);
+        }
+        serverModel.persistPlayersToNodesMapping();
       } else {
         stopGame();
       }
@@ -303,6 +309,7 @@ public class ServerLauncher implements ILauncher {
     final Path f = launchAction.getAutoSaveFile();
     try {
       serverGame.saveGame(f);
+      gameSelectorModel.setSaveGameFileToLoad(f);
     } catch (final Exception e) {
       log.error(bundle.getString("startup.ServerLauncher.err.SaveGame", f.toAbsolutePath()), e);
     }
