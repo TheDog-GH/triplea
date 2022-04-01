@@ -13,7 +13,7 @@ to help.
 
 - [:game_die: Player](#game_die-Player)
 - [:moneybag: Donor](#moneybag-Donor)
-- [:golf: Map Maker](#golf-Map-Maker)
+- [:golf: Map Maker](#golf-Maker)
 - [:book: Rule Expert](#book-Rule-Expert)
 - [:speech_balloon: Forum Moderator](#speech_balloon-Forum-Moderator)
 - [:bulb: Issue Manager](#bulb-Issue-Manager)
@@ -56,7 +56,11 @@ to help.
 #### _Skillset_
 
 - Basic knowledge of [XML](https://www.w3schools.com/XML/)
+- Using a text editing tool like [Notepad++](https://notepad-plus-plus.org/downloads/)
 - Graphic designer, i.e., creation of image files with advanced image editing software
+- Using a raster image program like [paint.NET](https://www.getpaint.net/) or Adobe Photoshop to produce baseTiles.pngs and reliefTiles.pngs
+- Use of vector software like [Inkscape Project](https://inkscape.org/) to produce baseTiles.pngs or the extra image layers on top of reliefTiles.pngs
+- Icon image program like [IcoFx 1.6.4](http://www.oldversion.com/windows/icofx-1-6-4) to produce units
 
 #### _Contributions_
 
