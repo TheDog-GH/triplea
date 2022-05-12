@@ -44,6 +44,9 @@ to help.
 #### _Skillset_
 
 - No requirements
+- Willingness to play a game multiple times to try to solve a particular problem.
+- The ability to spot inconsistencies or unintended results and then report them on Github.
+- To do background research and try to workout which version of TripleA caused the actual problem.
 
 #### _Contributions_
 
@@ -54,6 +57,7 @@ to help.
 #### _How to become one_
 
 - tbd
+- Download and test multiple versions of TripleA
 
 ### :moneybag: Donor
 
